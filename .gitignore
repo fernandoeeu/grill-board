@@ -1,0 +1,25 @@
+# dependencies
+node_modules
+
+# local SQLite database (WAL also creates -wal and -shm siblings)
+data/
+
+# build output
+dist
+dist-ssr
+.output
+.nitro
+.tanstack
+.vinxi
+.wrangler
+
+# env
+.env
+.env.*
+!.env.example
+
+# misc
+.DS_Store
+*.local
+__unconfig*
+todos.json

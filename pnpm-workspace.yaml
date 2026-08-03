@@ -1,0 +1,6 @@
+allowBuilds:
+  # better-sqlite3 13 ships prebuilt N-API binaries in the npm tarball.
+  # Approving the build would compile from source with node-gyp for no gain.
+  better-sqlite3: false
+  esbuild: true
+  lightningcss: true
