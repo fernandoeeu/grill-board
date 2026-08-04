@@ -10,6 +10,7 @@ import type {
   Progress,
   Question,
   Round,
+  RoundKind,
   TopicDetail,
   TopicStatus,
   TopicSummary,
@@ -38,7 +39,17 @@ interface RoundInsert {
   topic_id: string;
   number: number;
   title: string | null;
+  kind: RoundKind;
+  synthesis: string | null;
   created_at: number;
+}
+
+/** Optional extras for `createRound`; a plain round needs none of them. */
+export interface NewRound {
+  title?: string;
+  kind?: RoundKind;
+  /** Markdown consolidation; only meaningful on confirmation rounds. */
+  synthesis?: string;
 }
 
 /**
@@ -79,7 +90,21 @@ export function listTopics(status?: TopicStatus): TopicSummary[] {
     else byTopic.set(question.topicId, [question]);
   }
 
-  return topicRows.map((row) => toSummary(row, computeProgress(byTopic.get(row.id) ?? [])));
+  const roundRows = db
+    .prepare<{ topic_status: string | null }, { topic_id: string; count: number }>(
+      `SELECT r.topic_id AS topic_id, COUNT(*) AS count
+         FROM rounds r
+         JOIN topics t ON t.id = r.topic_id
+        WHERE (@topic_status IS NULL OR t.status = @topic_status)
+        GROUP BY r.topic_id`,
+    )
+    .all({ topic_status: filter });
+  const roundCounts = new Map(roundRows.map((row) => [row.topic_id, row.count]));
+
+  return topicRows.map((row) => {
+    const questions = byTopic.get(row.id) ?? [];
+    return toSummary(row, computeProgress(questions), questions, roundCounts.get(row.id) ?? 0);
+  });
 }
 
 /** Full state of one topic, or `null` when there is no such topic. Three queries. */
@@ -203,7 +228,8 @@ export function setTopicArchived(topicId: string, archived: boolean): TopicDetai
 }
 
 /** Open the next round on a topic. The number is `max(number) + 1`, starting at 1. */
-export function createRound(topicId: string, title?: string): Round {
+export function createRound(topicId: string, extras: NewRound = {}): Round {
+  const { title, kind = 'grill', synthesis } = extras;
   const db = getDb();
   const now = Date.now();
 
@@ -225,11 +251,13 @@ export function createRound(topicId: string, title?: string): Round {
       topic_id: topicId,
       number,
       title: title ?? null,
+      kind,
+      synthesis: synthesis ?? null,
       created_at: now,
     };
     db.prepare<RoundInsert>(
-      `INSERT INTO rounds (id, topic_id, number, title, created_at)
-       VALUES (@id, @topic_id, @number, @title, @created_at)`,
+      `INSERT INTO rounds (id, topic_id, number, title, kind, synthesis, created_at)
+       VALUES (@id, @topic_id, @number, @title, @kind, @synthesis, @created_at)`,
     ).run(values);
 
     db.prepare<[number, string]>('UPDATE topics SET updated_at = ? WHERE id = ?').run(now, topicId);
@@ -257,12 +285,21 @@ function topicExists(topicId: string): boolean {
   );
 }
 
-function toSummary(row: TopicRow, progress: Progress): TopicSummary {
+function toSummary(
+  row: TopicRow,
+  progress: Progress,
+  questions: Question[],
+  roundCount: number,
+): TopicSummary {
   const summary: TopicSummary = {
     id: row.id,
     title: row.title,
+    categories: parseCategories(row.categories),
     status: toTopicStatus(row.status),
     progress,
+    roundCount,
+    openCount: questions.filter((question) => question.status === 'open').length,
+    createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
   const context = optionalText(row.context);

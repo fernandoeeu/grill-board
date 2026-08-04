@@ -146,11 +146,14 @@ export function registerGrillTools(server: McpServer): void {
       description:
         'Open the next round of questions on a topic. The number is assigned for you — one more ' +
         'than the highest existing round, starting at 1. Returns {id, topicId, number, title?, ' +
-        'createdAt}; feed that id straight into add_questions. Use a new round for each new wave ' +
-        'of questions you fire after reading the answers to the previous one.',
+        'kind, synthesis?, createdAt}; feed that id straight into add_questions. Use a new round ' +
+        'for each new wave of questions you fire after reading the answers to the previous one. ' +
+        "When the frontier is empty, close with kind: 'confirmation' + synthesis (markdown) and " +
+        'one gate question whose options carry the proposed next step.',
       inputSchema: createRoundInput,
     },
-    ({ topicId, title }) => jsonResult(() => createRound(topicId, title)),
+    ({ topicId, title, kind, synthesis }) =>
+      jsonResult(() => createRound(topicId, { title, kind, synthesis })),
   );
 
   server.registerTool(

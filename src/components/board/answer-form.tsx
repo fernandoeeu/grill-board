@@ -27,7 +27,10 @@ const DRAFT_DEBOUNCE_MS = 400;
 const SAVED_FLASH_MS = 1400;
 
 const PILL_BASE =
-  'fade h-auto cursor-pointer rounded-full border px-4 py-2 text-sm font-medium';
+  // `max-w-full` + wrapping text keep a long option inside the card: the shadcn
+  // button base is `shrink-0 whitespace-nowrap`, which would otherwise widen the
+  // page instead of breaking the label.
+  'fade h-auto max-w-full min-w-0 shrink cursor-pointer rounded-full border px-4 py-2 text-left text-sm font-medium break-words whitespace-normal';
 
 const PILL_ACTIVE =
   'border-accent-600 bg-accent-600 text-white shadow-sm hover:bg-accent-600';

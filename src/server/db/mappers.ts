@@ -4,6 +4,7 @@ import type {
   Question,
   QuestionStatus,
   Round,
+  RoundKind,
   TopicStatus,
 } from '@/lib/types';
 
@@ -32,6 +33,8 @@ export interface RoundRow {
   topic_id: string;
   number: number;
   title: string | null;
+  kind: RoundKind;
+  synthesis: string | null;
   created_at: number;
 }
 
@@ -64,6 +67,8 @@ export function mapRoundRow(row: RoundRow): Round {
     topicId: row.topic_id,
     number: row.number,
     ...(row.title === null ? {} : { title: row.title }),
+    kind: row.kind,
+    ...(row.synthesis === null ? {} : { synthesis: row.synthesis }),
     createdAt: row.created_at,
   };
 }

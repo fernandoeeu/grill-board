@@ -13,6 +13,10 @@ declare global {
   var __grillBoardDb: SqliteDatabase | undefined;
 }
 
+// A new migration arrives over HMR while the connection is already cached, so
+// the fresh module must bring that cached connection up to date. Idempotent.
+if (globalThis.__grillBoardDb !== undefined) migrate(globalThis.__grillBoardDb);
+
 /**
  * The single database connection of the process.
  *

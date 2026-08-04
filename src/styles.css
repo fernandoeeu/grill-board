@@ -97,7 +97,7 @@
        set to Tailwind's `rounded-lg` (spec 4) so both agree. */
     --radius: 0.5rem;
 
-    --sidebar: oklch(0.985 0.001 106.423); /* stone-50 */
+    --sidebar: oklch(0.955 0.002 106.423); /* recessed rail behind the card */
     --sidebar-foreground: oklch(0.216 0.006 56.043); /* stone-900 */
     --sidebar-primary: var(--color-accent-600);
     --sidebar-primary-foreground: oklch(1 0 0); /* white */
@@ -190,7 +190,9 @@
     --chart-4: oklch(0.58 0.011 58);
     --chart-5: oklch(0.42 0.008 45);
 
-    --sidebar: oklch(0.185 0.005 52); /* between page and card */
+    /* Inset relief: the outer rail sits below the page, so the content card
+       reads as raised. Keep it darker than `--background`. */
+    --sidebar: oklch(0.115 0.004 52);
     --sidebar-foreground: oklch(0.97 0.001 106.424);
     --sidebar-primary: var(--color-accent-600);
     --sidebar-primary-foreground: oklch(0.18 0.006 56.043);
@@ -223,7 +225,9 @@
     .fade {
         transition:
             opacity 220ms ease,
-            transform 220ms ease;
+            transform 220ms ease,
+            background-color 220ms ease,
+            color 220ms ease;
     }
 }
 

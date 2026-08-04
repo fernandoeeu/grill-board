@@ -6,17 +6,16 @@
  * agent-made changes on screen without a manual refresh.
  */
 
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 
 import { ActionBar } from '@/components/board/action-bar'
-import { CategorySection } from '@/components/board/category-section'
-import { RoundFilter } from '@/components/board/round-filter'
+import { RoundNavigator } from '@/components/board/round-navigator'
+import { RoundSection } from '@/components/board/round-section'
 import { TopicHeader } from '@/components/board/topic-header'
+import { groupByRound } from '@/lib/board'
 import { topicQueryOptions } from '@/lib/queries'
-
-import type { Question } from '@/lib/types'
 
 export const Route = createFileRoute('/topics/$topicId')({
   loader: ({ context, params }) =>
@@ -24,63 +23,16 @@ export const Route = createFileRoute('/topics/$topicId')({
   component: TopicBoard,
 })
 
-interface Section {
-  category: string
-  questions: Question[]
-}
-
-/**
- * Groups the visible questions into sections, in the topic's declared category
- * order. Empty categories are dropped. A question whose category is not
- * declared would otherwise never render, so those land in a trailing section
- * instead of disappearing.
- */
-function groupByCategory(
-  questions: Question[],
-  categories: string[],
-): Section[] {
-  const grouped = new Map<string, Question[]>()
-  for (const question of questions) {
-    const bucket = grouped.get(question.category)
-    if (bucket) bucket.push(question)
-    else grouped.set(question.category, [question])
-  }
-
-  const declared = categories
-    .map((category) => ({
-      category,
-      questions: grouped.get(category) ?? [],
-    }))
-    .filter((section) => section.questions.length > 0)
-
-  const undeclared = [...grouped.entries()]
-    .filter(([category]) => !categories.includes(category))
-    .map(([category, items]) => ({ category, questions: items }))
-
-  return [...declared, ...undeclared]
-}
-
 function TopicBoard() {
   const { topicId } = Route.useParams()
   const { data: topic } = useSuspenseQuery(topicQueryOptions(topicId))
-  const [activeRound, setActiveRound] = useState<number | null>(null)
 
   const questions = topic?.questions
-  const categories = topic?.categories
-
-  const visible = useMemo(
-    () =>
-      activeRound === null
-        ? (questions ?? [])
-        : (questions ?? []).filter(
-            (question) => question.roundNumber === activeRound,
-          ),
-    [questions, activeRound],
-  )
+  const rounds = topic?.rounds
 
   const sections = useMemo(
-    () => groupByCategory(visible, categories ?? []),
-    [visible, categories],
+    () => groupByRound(questions ?? [], rounds ?? []),
+    [questions, rounds],
   )
 
   if (!topic) {
@@ -102,30 +54,24 @@ function TopicBoard() {
     <>
       <TopicHeader topic={topic} />
 
-      <main className="mx-auto w-full max-w-3xl px-6 pt-10 pb-40">
-        <RoundFilter
-          rounds={topic.rounds}
-          active={activeRound}
-          onChange={setActiveRound}
-        />
+      <RoundNavigator rounds={topic.rounds} questions={topic.questions} />
 
-        <div className="mt-10">
-          {sections.length === 0 ? (
-            <p className="mt-16 text-center text-sm text-stone-400">
-              No questions in this round.
-            </p>
-          ) : (
-            sections.map((section) => (
-              <CategorySection
-                key={section.category}
-                topicId={topic.id}
-                category={section.category}
-                questions={section.questions}
-                categories={topic.categories}
-              />
-            ))
-          )}
-        </div>
+      <main className="mx-auto w-full max-w-3xl px-6 pt-10 pb-40">
+        {sections.length === 0 ? (
+          <p className="mt-16 text-center text-sm text-stone-400">
+            No questions yet.
+          </p>
+        ) : (
+          sections.map((section) => (
+            <RoundSection
+              key={section.round.id}
+              topicId={topic.id}
+              round={section.round}
+              questions={section.questions}
+              categories={topic.categories}
+            />
+          ))
+        )}
       </main>
 
       <ActionBar topic={topic} />

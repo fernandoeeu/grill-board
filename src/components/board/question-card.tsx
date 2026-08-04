@@ -37,8 +37,9 @@ export function QuestionCard({
   return (
     <article
       id={question.id}
+      data-question-id={question.id}
       className={cn(
-        'rounded-xl bg-white p-6 ring-1 sm:p-7',
+        'min-w-0 scroll-mt-48 rounded-xl bg-white p-6 ring-1 sm:p-7',
         question.status === 'open' ? 'ring-stone-200' : 'ring-stone-100',
         question.status === 'suspended' && 'opacity-60',
       )}
@@ -46,8 +47,9 @@ export function QuestionCard({
       <div className="flex flex-wrap items-center gap-3">
         <span className="font-mono text-xs text-stone-400">{question.id}</span>
         <span className="text-xs text-stone-300">·</span>
-        <span className="text-xs font-medium text-stone-500">
-          Round {question.roundNumber}
+        {/* The board groups by round, so the card labels the category instead. */}
+        <span className="min-w-0 text-[11px] font-semibold tracking-[0.12em] text-stone-500 break-words uppercase">
+          {question.category}
         </span>
         <span className="grow" />
         <Badge
@@ -66,7 +68,7 @@ export function QuestionCard({
         />
       </div>
 
-      <p className="mt-4 text-[17px] leading-relaxed font-medium text-stone-900">
+      <p className="mt-4 text-[17px] leading-relaxed font-medium break-words text-stone-900">
         {question.text}
       </p>
 
@@ -75,7 +77,7 @@ export function QuestionCard({
           <div className={cn(PANEL_LABEL, 'text-accent-700')}>
             Recommendation
           </div>
-          <p className="mt-1 text-sm leading-relaxed text-stone-600">
+          <p className="mt-1 text-sm leading-relaxed break-words text-stone-600">
             {question.recommendation}
           </p>
         </div>
@@ -93,14 +95,14 @@ export function QuestionCard({
               </span>
             )}
           </div>
-          <p className="mt-1 text-sm leading-relaxed text-stone-700">
+          <p className="mt-1 text-sm leading-relaxed break-words text-stone-700">
             {question.answer}
           </p>
         </div>
       )}
 
       {question.note && (
-        <p className="mt-4 text-sm leading-relaxed text-stone-400 italic">
+        <p className="mt-4 text-sm leading-relaxed break-words text-stone-400 italic">
           {question.note}
         </p>
       )}

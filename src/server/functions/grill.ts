@@ -111,8 +111,18 @@ export const setTopicArchivedFn = createServerFn({ method: 'POST' })
 
 /** Opens the next round; its number is assigned by the DAL. */
 export const createRoundFn = createServerFn({ method: 'POST' })
-  .validator(z.object({ topicId, title: z.string().min(1).optional() }))
-  .handler(({ data }): Round => guard(() => createRound(data.topicId, data.title)));
+  .validator(
+    z.object({
+      topicId,
+      title: z.string().min(1).optional(),
+      kind: z.enum(['grill', 'confirmation']).optional(),
+      synthesis: z.string().min(1).optional(),
+    }),
+  )
+  .handler(({ data }): Round => {
+    const { topicId: id, ...extras } = data;
+    return guard(() => createRound(id, extras));
+  });
 
 export const addQuestionsFn = createServerFn({ method: 'POST' })
   .validator(

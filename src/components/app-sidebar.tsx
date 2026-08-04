@@ -12,7 +12,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Progress } from '@/components/ui/progress'
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from '@/components/ui/hover-card'
 import {
   Sidebar,
   SidebarContent,
@@ -26,7 +30,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-  SidebarTrigger,
 } from '@/components/ui/sidebar'
 import { invalidateTopicQueries, topicsQueryOptions } from '@/lib/queries'
 import { cn } from '@/lib/utils'
@@ -36,15 +39,35 @@ import type { TopicSummary } from '@/lib/types'
 
 const EYEBROW = 'text-[11px] font-semibold tracking-[0.16em] uppercase'
 
-/** Thin progress bar of the §4.4 board, sized for a sidebar row. */
-const SIDEBAR_PROGRESS =
-  'w-full min-w-0 flex-1 gap-0 [&_[data-slot=progress-track]]:h-1 [&_[data-slot=progress-track]]:bg-stone-100 [&_[data-slot=progress-indicator]]:rounded-full [&_[data-slot=progress-indicator]]:bg-accent-600'
+const MINUTE = 60_000
+const HOUR = 60 * MINUTE
+const DAY = 24 * HOUR
+const WEEK = 7 * DAY
+
+/** Short relative time for the sidebar rows: "now", "9m", "2h", "6d", "3w". */
+function shortRelativeTime(timestamp: number, now = Date.now()): string {
+  const elapsed = Math.max(0, now - timestamp)
+  if (elapsed < MINUTE) return 'now'
+  if (elapsed < HOUR) return `${Math.floor(elapsed / MINUTE)}m`
+  if (elapsed < DAY) return `${Math.floor(elapsed / HOUR)}h`
+  if (elapsed < WEEK) return `${Math.floor(elapsed / DAY)}d`
+  return `${Math.floor(elapsed / WEEK)}w`
+}
+
+/** Absolute date for the hover card, e.g. "3 Aug 2026". */
+function formatDate(timestamp: number): string {
+  return new Date(timestamp).toLocaleDateString(undefined, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
+}
 
 export function AppSidebar() {
   const { data: topics } = useSuspenseQuery(topicsQueryOptions())
   const queryClient = useQueryClient()
   const [isNewTopicOpen, setNewTopicOpen] = useState(false)
-  const [isArchivedOpen, setArchivedOpen] = useState(false)
+  const [isSettledOpen, setSettledOpen] = useState(false)
 
   const setArchived = useMutation({
     mutationFn: (input: { topicId: string; archived: boolean }) =>
@@ -61,30 +84,24 @@ export function AppSidebar() {
   }
 
   const activeTopics = topics.filter((topic) => topic.status === 'active')
-  const archivedTopics = topics.filter((topic) => topic.status === 'archived')
+  const settledTopics = topics.filter((topic) => topic.status === 'archived')
 
   return (
     <>
-      <Sidebar collapsible="offcanvas">
+      <Sidebar variant="inset" collapsible="offcanvas">
         <SidebarHeader className="gap-0 px-3 pt-4 pb-2">
-          <div className="flex items-center justify-between gap-2">
-            <span className={cn(EYEBROW, 'text-stone-400')}>Grill Board</span>
-            <SidebarTrigger className="-mr-1 text-stone-400" />
-          </div>
+          <span className={cn(EYEBROW, 'text-stone-500')}>Grill Board</span>
         </SidebarHeader>
 
         <SidebarContent>
           <SidebarGroup>
-            <SidebarGroupLabel className={cn(EYEBROW, 'text-stone-500')}>
-              Topics
-            </SidebarGroupLabel>
             <SidebarGroupContent>
               {activeTopics.length === 0 ? (
                 <p className="px-2 py-1.5 text-sm leading-relaxed text-stone-400">
                   No topics yet.
                 </p>
               ) : (
-                <SidebarMenu className="gap-1">
+                <SidebarMenu className="gap-0.5">
                   {activeTopics.map((topic) => (
                     <TopicItem
                       key={topic.id}
@@ -97,26 +114,26 @@ export function AppSidebar() {
             </SidebarGroupContent>
           </SidebarGroup>
 
-          {archivedTopics.length > 0 && (
-            <SidebarGroup>
+          {settledTopics.length > 0 && (
+            <SidebarGroup className="mt-auto">
               <SidebarGroupLabel
                 elementType="button"
-                aria-expanded={isArchivedOpen}
-                onClick={() => setArchivedOpen((open) => !open)}
+                aria-expanded={isSettledOpen}
+                onClick={() => setSettledOpen((open) => !open)}
                 className={cn(EYEBROW, 'w-full cursor-pointer gap-1.5 text-stone-500')}
               >
                 <ChevronRightIcon
-                  className={cn('transition-transform', isArchivedOpen && 'rotate-90')}
+                  className={cn('transition-transform', isSettledOpen && 'rotate-90')}
                 />
-                Archived
-                <span className="text-xs tracking-normal text-stone-300 normal-case">
-                  {archivedTopics.length}
+                Settled
+                <span className="text-xs tracking-normal text-stone-400 normal-case">
+                  {settledTopics.length}
                 </span>
               </SidebarGroupLabel>
-              {isArchivedOpen && (
+              {isSettledOpen && (
                 <SidebarGroupContent>
-                  <SidebarMenu className="gap-1">
-                    {archivedTopics.map((topic) => (
+                  <SidebarMenu className="gap-0.5">
+                    {settledTopics.map((topic) => (
                       <TopicItem
                         key={topic.id}
                         topic={topic}
@@ -133,7 +150,7 @@ export function AppSidebar() {
         <SidebarFooter className="flex-row items-center gap-2 px-3 pb-4">
           <Button
             onPress={() => setNewTopicOpen(true)}
-            className="h-auto flex-1 rounded-full bg-stone-900 px-5 py-2 text-sm font-medium text-white hover:bg-stone-800"
+            className="h-auto flex-1 rounded-lg bg-stone-900 px-5 py-2 text-sm font-medium text-white hover:bg-stone-800"
           >
             <PlusIcon />
             New topic
@@ -158,7 +175,9 @@ function TopicItem({
 }) {
   const router = useRouter()
   const matchRoute = useMatchRoute()
-  const { done, total, percent } = topic.progress
+  const { done, total } = topic.progress
+  // Decision 2: the dot marks questions still `open`, not merely "incomplete".
+  const hasOpenQuestions = topic.openCount > 0
 
   const href = router.buildLocation({
     to: '/topics/$topicId',
@@ -170,32 +189,46 @@ function TopicItem({
 
   return (
     <SidebarMenuItem>
-      <SidebarMenuButton
-        href={href}
-        isActive={isActive}
-        className={cn(
-          'h-auto flex-col items-start gap-1.5 py-2',
-          topic.status === 'archived' && 'opacity-60',
-        )}
-      >
-        <span className="w-full truncate text-sm leading-snug">{topic.title}</span>
-        <div className="flex w-full items-center gap-2">
-          <Progress
-            value={percent}
-            aria-label={`${done} of ${total} questions answered`}
-            className={SIDEBAR_PROGRESS}
-          />
-          <span className="font-mono text-[11px] text-stone-400 tabular-nums">
-            {done}/{total}
-          </span>
-        </div>
-      </SidebarMenuButton>
+      <HoverCard>
+        <HoverCardTrigger>
+          <SidebarMenuButton
+            href={href}
+            isActive={isActive}
+            className={cn(
+              'fade h-auto flex-col items-start gap-1 py-2',
+              topic.status === 'archived' && 'opacity-60',
+            )}
+          >
+            <span className="w-full truncate text-sm leading-snug">{topic.title}</span>
+            <span className="flex w-full items-center gap-1.5 text-[11px] leading-none text-stone-500">
+              <span className="tabular-nums">{shortRelativeTime(topic.updatedAt)}</span>
+              <span aria-hidden>·</span>
+              <span className="font-mono tabular-nums">
+                {done}/{total}
+              </span>
+              {hasOpenQuestions && (
+                <>
+                  <span className="sr-only">Has open questions</span>
+                  <span
+                    aria-hidden
+                    className="ml-auto size-1.5 shrink-0 rounded-full bg-accent-600/90"
+                  />
+                </>
+              )}
+            </span>
+          </SidebarMenuButton>
+        </HoverCardTrigger>
+
+        <HoverCardContent placement="right top" className="w-80">
+          <TopicHoverDetails topic={topic} />
+        </HoverCardContent>
+      </HoverCard>
 
       <DropdownMenuTrigger>
         <SidebarMenuAction
           showOnHover
           aria-label={`Actions for ${topic.title}`}
-          className="top-2 text-stone-400"
+          className="top-2 text-stone-400 group-hover/menu-item:text-sidebar-accent-foreground"
         >
           <MoreHorizontalIcon />
         </SidebarMenuAction>
@@ -206,5 +239,48 @@ function TopicItem({
         </DropdownMenu>
       </DropdownMenuTrigger>
     </SidebarMenuItem>
+  )
+}
+
+function TopicHoverDetails({ topic }: { topic: TopicSummary }) {
+  const { done, total, percent } = topic.progress
+
+  return (
+    <div className="flex flex-col gap-2.5">
+      <p className="text-sm leading-snug font-medium">{topic.title}</p>
+
+      {topic.context && (
+        <p className="line-clamp-4 text-xs leading-relaxed text-stone-500">
+          {topic.context}
+        </p>
+      )}
+
+      {topic.categories.length > 0 && (
+        <div className="flex flex-wrap gap-1">
+          {topic.categories.map((category) => (
+            <span
+              key={category}
+              className="rounded-full bg-stone-200 px-2 py-0.5 text-[11px] leading-tight text-stone-700"
+            >
+              {category}
+            </span>
+          ))}
+        </div>
+      )}
+
+      <div className="h-px bg-stone-100" />
+
+      <p className="font-mono text-[11px] text-stone-500 tabular-nums">
+        {done}/{total} answered · {percent}% ·{' '}
+        {topic.roundCount === 1 ? '1 round' : `${topic.roundCount} rounds`}
+      </p>
+
+      <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-[11px] text-stone-400">
+        <dt>Created</dt>
+        <dd className="tabular-nums">{formatDate(topic.createdAt)}</dd>
+        <dt>Updated</dt>
+        <dd className="tabular-nums">{formatDate(topic.updatedAt)}</dd>
+      </dl>
+    </div>
   )
 }

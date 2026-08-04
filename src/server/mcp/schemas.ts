@@ -87,6 +87,25 @@ export const archiveTopicInput = z.object({
 export const createRoundInput = z.object({
   topicId,
   title: z.string().optional().describe('Optional label for the round, e.g. "Deployment gaps".'),
+  kind: z
+    .enum(['grill', 'confirmation'])
+    .optional()
+    .describe(
+      "'grill' (default) is a normal wave of questions. 'confirmation' is the closing gate: " +
+        'pass your consolidated understanding in `synthesis`, then add ONE gate question via ' +
+        'add_questions — its options should offer the next step (e.g. "rodar to-spec + ' +
+        'to-tickets" / "executar agora" / "rodar handoff p/ próximo agente" / "outra"). A topic ' +
+        'may hold several confirmation rounds; the last one answered as confirmed concludes the grill.',
+    ),
+  synthesis: z
+    .string()
+    .min(1)
+    .optional()
+    .describe(
+      'Markdown consolidation rendered at the top of a confirmation round: the decisions, ' +
+        'out-of-scope items and pending points the human is asked to confirm. Requires ' +
+        "kind: 'confirmation'.",
+    ),
 });
 
 const newQuestionSchema = z.object({

@@ -7,7 +7,6 @@
  */
 
 import { Progress } from '@/components/ui/progress'
-import { SidebarTrigger } from '@/components/ui/sidebar'
 import {
   AddQuestionsDialog,
   AddRoundDialog,
@@ -19,11 +18,9 @@ export function TopicHeader({ topic }: { topic: TopicDetail }) {
   const { done, total, percent } = topic.progress
 
   return (
-    <header className="sticky top-0 z-30 border-b border-stone-100 bg-white/85 backdrop-blur">
-      <div className="mx-auto max-w-3xl px-6 py-5">
+    <header className="sticky top-10 z-30 border-b border-stone-100 bg-background/85 backdrop-blur">
+      <div className="mx-auto max-w-3xl px-6 pt-1 pb-5">
         <div className="flex items-center gap-3">
-          {/* The sidebar's own trigger goes away with it, so the board keeps one. */}
-          <SidebarTrigger className="-ml-1 text-stone-400" />
           <span className="text-[11px] font-semibold tracking-[0.16em] text-stone-400 uppercase">
             Grill
           </span>

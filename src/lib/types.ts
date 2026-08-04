@@ -19,11 +19,21 @@ export interface Draft {
   text?: string;
 }
 
+/**
+ * 'grill' is a normal wave of questions. 'confirmation' carries the agent's
+ * consolidated understanding (`synthesis`) plus a single gate question; the
+ * last confirmation answered "confirmed" concludes the grill.
+ */
+export type RoundKind = 'grill' | 'confirmation';
+
 export interface Round {
   id: string;
   topicId: string;
   number: number;
   title?: string;
+  kind: RoundKind;
+  /** Markdown. Only present on confirmation rounds. */
+  synthesis?: string;
   createdAt: number;
 }
 
@@ -68,8 +78,15 @@ export interface TopicSummary {
   id: string;
   title: string;
   context?: string;
+  /** Ordered; same list the board detail exposes. */
+  categories: string[];
   status: TopicStatus;
   progress: Progress;
+  /** How many rounds the topic has, empty ones included. */
+  roundCount: number;
+  /** Questions still with status `open`, drafts included. Drives the sidebar dot. */
+  openCount: number;
+  createdAt: number;
   updatedAt: number;
 }
 

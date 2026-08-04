@@ -73,6 +73,15 @@ const MIGRATIONS: ReadonlyArray<Migration> = [
     version: 2,
     sql: `ALTER TABLE questions ADD COLUMN recommended_option TEXT;`,
   },
+  {
+    /** Version 3 — confirmation rounds: kind + markdown synthesis. */
+    version: 3,
+    sql: `
+      ALTER TABLE rounds ADD COLUMN kind TEXT NOT NULL
+        CHECK (kind IN ('grill','confirmation')) DEFAULT 'grill';
+      ALTER TABLE rounds ADD COLUMN synthesis TEXT;
+    `,
+  },
 ];
 
 /** Bring the database up to the latest schema version. Safe to call on every open. */
