@@ -4,6 +4,7 @@ import {
   Scripts,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
@@ -49,6 +50,11 @@ export const Route = createRootRouteWithContext<GrillRouterContext>()({
 })
 
 function RootDocument({ children }: { children: ReactNode }) {
+  // The landing is a fullscreen flyer: no sidebar shell, no app chrome.
+  const isLanding = useRouterState({
+    select: (state) => state.location.pathname === '/landing',
+  })
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -59,17 +65,21 @@ function RootDocument({ children }: { children: ReactNode }) {
       <body>
         <ThemeProvider>
           <AriaLinkBridge>
-            <SidebarProvider>
-              <AppSidebar />
-              <SidebarInset className="min-w-0 ring-1 ring-stone-200">
-                {/* The one trigger of the app: thin bar pinned to the top of
-                    the inset card, on every route. */}
-                <header className="sticky top-0 z-40 flex h-10 shrink-0 items-center gap-2 border-b border-stone-100 bg-background/85 px-3 backdrop-blur md:rounded-t-xl">
-                  <SidebarTrigger className="text-stone-400" />
-                </header>
-                {children}
-              </SidebarInset>
-            </SidebarProvider>
+            {isLanding ? (
+              children
+            ) : (
+              <SidebarProvider>
+                <AppSidebar />
+                <SidebarInset className="min-w-0 ring-1 ring-stone-200">
+                  {/* The one trigger of the app: thin bar pinned to the top of
+                      the inset card, on every route. */}
+                  <header className="sticky top-0 z-40 flex h-10 shrink-0 items-center gap-2 border-b border-stone-100 bg-background/85 px-3 backdrop-blur md:rounded-t-xl">
+                    <SidebarTrigger className="text-stone-400" />
+                  </header>
+                  {children}
+                </SidebarInset>
+              </SidebarProvider>
+            )}
             <Toaster
               position="bottom-center"
               // Clears the board's fixed action bar, like the prototype toast.
