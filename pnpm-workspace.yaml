@@ -4,3 +4,4 @@ allowBuilds:
   better-sqlite3: false
   esbuild: true
   lightningcss: true
+  msgpackr-extract: true

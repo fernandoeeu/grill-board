@@ -1,14 +1,25 @@
 {
   "name": "grill-board",
+  "version": "0.1.0",
   "license": "FSL-1.1-MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/fernandoeeu/grill-board"
   },
+  "bin": {
+    "grill-board": "dist/bin/serve.js"
+  },
+  "files": [
+    "dist/",
+    "LICENSE",
+    "README.md"
+  ],
   "type": "module",
   "scripts": {
     "dev": "vite dev --port 3000",
-    "build": "vite build",
+    "build": "vite build && tsc -p tsconfig.bin.json",
+    "build:app": "vite build",
+    "build:bin": "tsc -p tsconfig.bin.json",
     "start": "vite preview --port 3000",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
@@ -19,6 +30,7 @@
     "format:check": "oxfmt --check ."
   },
   "dependencies": {
+    "@effect/platform-node": "4.0.0-rc.112",
     "@modelcontextprotocol/server": "2.0.0",
     "@tailwindcss/vite": "^4.3.3",
     "@tanstack/react-devtools": "^0.10.9",
@@ -31,6 +43,7 @@
     "better-sqlite3": "13.0.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "effect": "4.0.0-rc.112",
     "lucide-react": "^1.28.0",
     "react": "^19.2.0",
     "react-aria-components": "^1.20.0",
