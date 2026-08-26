@@ -1,0 +1,13 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nicolo-ribaudo/oxlint-config/refs/heads/main/schema.json",
+  "rules": {
+    "no-unused-vars": "warn",
+    "no-console": "off",
+    "eqeqeq": "error",
+    "no-debugger": "error",
+    "no-duplicate-imports": "error",
+    "no-var": "error",
+    "prefer-const": "warn"
+  },
+  "ignorePatterns": ["node_modules", "dist", ".vinxi", ".output", "src/routeTree.gen.ts"]
+}

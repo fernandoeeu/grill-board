@@ -6,9 +6,6 @@
     "type": "git",
     "url": "https://github.com/fernandoeeu/grill-board"
   },
-  "engines": {
-    "node": ">=22"
-  },
   "scripts": {
     "dev": "vite dev --port 3000",
     "build": "vite build",
@@ -16,7 +13,10 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "seed": "tsx scripts/seed.ts",
-    "generate-routes": "tsr generate"
+    "generate-routes": "tsr generate",
+    "lint": "oxlint .",
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check ."
   },
   "dependencies": {
     "@modelcontextprotocol/server": "2.0.0",
@@ -50,8 +50,13 @@
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^6.0.1",
+    "oxfmt": "^0.65.0",
+    "oxlint": "^1.80.0",
     "tsx": "4.23.4",
     "typescript": "^6.0.2",
     "vite": "^8.0.0"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }
