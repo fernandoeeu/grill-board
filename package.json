@@ -2,6 +2,10 @@
   "name": "grill-board",
   "private": true,
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fernandoeeu/grill-board"
+  },
   "engines": {
     "node": ">=22"
   },
