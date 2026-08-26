@@ -1,7 +1,7 @@
 # 0001 — Distribute the Grill Board publicly under MIT
 
 - **Date:** 2026-08-08
-- **Status:** Accepted
+- **Status:** Superseded by 0013
 - **Decided by:** Owner (grill session)
 
 ## Context

@@ -1,7 +1,7 @@
 # 0012 — Public GitHub repo with MIT license
 
 - **Date:** 2026-08-08
-- **Status:** Accepted
+- **Status:** Superseded by 0013
 - **Decided by:** Owner (grill session)
 
 ## Context
@@ -10,7 +10,7 @@ The app needs a public home for source code, issues, and community contributions
 
 ## Decision
 
-Host the public repo at `github.com/fernandodudata/grill-board` with an MIT `LICENSE` file at the root.
+Host the public repo at `github.com/fernandoeeu/grill-board` with an MIT `LICENSE` file at the root.
 
 ## Consequences
 

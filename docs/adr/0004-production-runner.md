@@ -1,7 +1,7 @@
 # 0004 — Plain Node bin harness over TanStack Start output
 
 - **Date:** 2026-08-08
-- **Status:** Accepted
+- **Status:** Superseded by 0014
 - **Decided by:** Owner (grill session)
 
 ## Context
