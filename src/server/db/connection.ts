@@ -1,11 +1,16 @@
 import { mkdirSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { homedir } from 'node:os';
+import { dirname, join, resolve } from 'node:path';
 import Database from 'better-sqlite3';
 import type { Database as SqliteDatabase } from 'better-sqlite3';
 import { migrate } from './migrations';
 
-/** Default location, overridable with the `GRILL_BOARD_DB` environment variable. */
-const DEFAULT_DB_PATH = 'data/grill-board.db';
+/** XDG-compliant default: $XDG_DATA_HOME/grill-board/grill-board.db */
+const DEFAULT_DB_PATH = join(
+  process.env.XDG_DATA_HOME?.trim() || join(homedir(), '.local', 'share'),
+  'grill-board',
+  'grill-board.db',
+);
 
 declare global {
   // Cached on globalThis so the Vite dev server keeps one connection across HMR.
@@ -46,7 +51,7 @@ function open(): SqliteDatabase {
   return database;
 }
 
-function databaseFile(): string {
+export function databaseFile(): string {
   const override = process.env.GRILL_BOARD_DB?.trim();
   return resolve(override !== undefined && override !== '' ? override : DEFAULT_DB_PATH);
 }

@@ -84,6 +84,9 @@ const MIGRATIONS: ReadonlyArray<Migration> = [
   },
 ];
 
+/** The highest migration version the running code knows about. */
+export const LATEST_VERSION: number = MIGRATIONS[MIGRATIONS.length - 1]!.version;
+
 /** Bring the database up to the latest schema version. Safe to call on every open. */
 export function migrate(db: Database): void {
   db.exec(`
