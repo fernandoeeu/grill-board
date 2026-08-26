@@ -12,7 +12,12 @@ const config = defineConfig({
   // out of the dev pre-bundler so the prebuilt .node binary is loaded at runtime.
   ssr: { external: ["better-sqlite3"] },
   optimizeDeps: { exclude: ["better-sqlite3"] },
-  plugins: [devtools(), tailwindcss(), tanstackStart(), viteReact()],
+  plugins: [
+    ...devtools().map((p) => ({ ...p, apply: "serve" as const })),
+    tailwindcss(),
+    tanstackStart(),
+    viteReact(),
+  ],
 });
 
 export default config;
