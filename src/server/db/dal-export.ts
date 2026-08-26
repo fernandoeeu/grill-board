@@ -6,9 +6,9 @@
  */
 
 import type { AnsweredVia, PendingQuestion } from "@/lib/types";
-import { getDb } from "./connection";
-import { topicNotFound } from "./errors";
-import { mapQuestionRow, type QuestionRow } from "./mappers";
+import { getDb } from "./connection.js";
+import { topicNotFound } from "./errors.js";
+import { mapQuestionRow, type QuestionRow } from "./mappers.js";
 
 /** A question row carried with the title of its topic. */
 interface PendingRow extends QuestionRow {

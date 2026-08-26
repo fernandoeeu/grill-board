@@ -16,9 +16,9 @@ import type { Database as SqliteDatabase } from "better-sqlite3";
 
 import type { AnsweredVia, Draft, NewQuestion, Question, QuestionStatus } from "@/lib/types";
 
-import { getDb } from "./connection";
-import { questionNotFound, roundNotFound, topicNotFound } from "./errors";
-import { mapQuestionRow, type QuestionRow } from "./mappers";
+import { getDb } from "./connection.js";
+import { questionNotFound, roundNotFound, topicNotFound } from "./errors.js";
+import { mapQuestionRow, type QuestionRow } from "./mappers.js";
 
 /** Shared shape of every question read: the row plus its round number. */
 const QUESTION_SELECT = `

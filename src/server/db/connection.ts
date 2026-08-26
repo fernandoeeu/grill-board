@@ -2,7 +2,7 @@ import { mkdirSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import Database, { type Database as SqliteDatabase } from "better-sqlite3";
-import { migrate } from "./migrations";
+import { migrate } from "./migrations.js";
 
 /** XDG-compliant default: $XDG_DATA_HOME/grill-board/grill-board.db */
 const DEFAULT_DB_PATH = join(

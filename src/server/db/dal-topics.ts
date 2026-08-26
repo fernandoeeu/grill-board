@@ -15,16 +15,16 @@ import type {
   TopicStatus,
   TopicSummary,
 } from "@/lib/types";
-import { getDb } from "./connection";
-import { topicNotFound } from "./errors";
+import { getDb } from "./connection.js";
+import { topicNotFound } from "./errors.js";
 import {
   mapQuestionRow,
   mapRoundRow,
   type QuestionRow,
   type RoundRow,
   type TopicRow,
-} from "./mappers";
-import { computeProgress } from "./progress";
+} from "./mappers.js";
+import { computeProgress } from "./progress.js";
 
 const TOPIC_COLUMNS = "id, title, context, categories, status, created_at, updated_at";
 

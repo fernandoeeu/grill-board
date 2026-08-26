@@ -6,9 +6,9 @@
  * topic over MCP. Idempotent: it returns early when the topic already exists.
  */
 import type { NewQuestion, QuestionStatus } from "@/lib/types";
-import { createRound, createTopic, getTopic } from "./dal-topics";
-import { addQuestions, answerQuestion } from "./dal-questions";
-import { seedTopic, type SeedQuestion } from "./seed-data";
+import { createRound, createTopic, getTopic } from "./dal-topics.js";
+import { addQuestions, answerQuestion } from "./dal-questions.js";
+import { seedTopic, type SeedQuestion } from "./seed-data.js";
 
 /**
  * Status a question is CREATED with.

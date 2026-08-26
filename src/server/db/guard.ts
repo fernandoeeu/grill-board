@@ -1,8 +1,8 @@
 import { copyFileSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import Database from "better-sqlite3";
-import { databaseFile } from "./connection";
-import { LATEST_VERSION } from "./migrations";
+import { databaseFile } from "./connection.js";
+import { LATEST_VERSION } from "./migrations.js";
 
 /** Legacy DB path used before the XDG migration. */
 const LEGACY_DB_PATH = "data/grill-board.db";
