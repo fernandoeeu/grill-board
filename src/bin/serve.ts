@@ -166,9 +166,9 @@ const program = Effect.gen(function* () {
 
   // Import the SSR handler (WinterCG fetch)
   const ssrModule = (yield* Effect.promise(() => import(SERVER_ENTRY))) as {
-    default: (request: Request) => Response | Promise<Response>;
+    default: { fetch: (request: Request) => Response | Promise<Response> };
   };
-  const ssrHandler = ssrModule.default;
+  const ssrHandler = ssrModule.default.fetch;
 
   // Preferred port: --port flag, PORT env, or 3000
   const portArg = process.argv.indexOf("--port");
@@ -261,7 +261,11 @@ const program = Effect.gen(function* () {
   console.log("  Register this MCP server in your agent client:");
   console.log(`    npx grill-board init\n`);
   console.log(`  Or add manually to your MCP config:`);
-  console.log(`    "grill-board": { "command": "npx", "args": ["grill-board"] }\n`);
+  const mcpArgs =
+    boundPort !== 3000
+      ? `"command": "npx", "args": ["grill-board", "--port", "${boundPort}"]`
+      : `"command": "npx", "args": ["grill-board"]`;
+  console.log(`    "grill-board": { ${mcpArgs} }\n`);
 
   // Shell alias hint (ADR 0007)
   printShellAliasHint();
