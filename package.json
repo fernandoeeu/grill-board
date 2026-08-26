@@ -1,6 +1,6 @@
 {
   "name": "grill-board",
-  "private": true,
+  "license": "FSL-1.1-MIT",
   "type": "module",
   "repository": {
     "type": "git",
