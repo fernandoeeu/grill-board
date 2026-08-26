@@ -5,11 +5,10 @@
  * seeded rows go through exactly the same code path as an agent creating a
  * topic over MCP. Idempotent: it returns early when the topic already exists.
  */
-import type { NewQuestion, QuestionStatus } from '@/lib/types';
-import { createRound, createTopic, getTopic } from './dal-topics';
-import { addQuestions, answerQuestion } from './dal-questions';
-import { seedTopic } from './seed-data';
-import type { SeedQuestion } from './seed-data';
+import type { NewQuestion, QuestionStatus } from "@/lib/types";
+import { createRound, createTopic, getTopic } from "./dal-topics";
+import { addQuestions, answerQuestion } from "./dal-questions";
+import { seedTopic, type SeedQuestion } from "./seed-data";
 
 /**
  * Status a question is CREATED with.
@@ -20,7 +19,7 @@ import type { SeedQuestion } from './seed-data';
  * together with its note.
  */
 function initialStatus(question: SeedQuestion): QuestionStatus {
-  return question.status === 'answered' ? 'open' : question.status;
+  return question.status === "answered" ? "open" : question.status;
 }
 
 /** Seed question → DAL input, omitting absent optional fields entirely. */
@@ -67,9 +66,7 @@ export function seedIfEmpty(): void {
     roundIds.set(created.number, created.id);
   }
 
-  const orphan = seedTopic.questions.find(
-    (question) => !roundIds.has(question.round),
-  );
+  const orphan = seedTopic.questions.find((question) => !roundIds.has(question.round));
   if (orphan) {
     throw new Error(
       `seed: question '${orphan.id}' belongs to round ${orphan.round}, which the seed does not declare`,
@@ -89,11 +86,6 @@ export function seedIfEmpty(): void {
   // created, so an answered question keeps its quick options (q6).
   for (const question of seedTopic.questions) {
     if (question.answer === undefined) continue;
-    answerQuestion(
-      seedTopic.id,
-      question.id,
-      question.answer,
-      question.answeredVia ?? 'chat',
-    );
+    answerQuestion(seedTopic.id, question.id, question.answer, question.answeredVia ?? "chat");
   }
 }

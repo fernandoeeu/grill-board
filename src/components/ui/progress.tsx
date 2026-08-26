@@ -1,28 +1,28 @@
-import * as React from "react"
+import * as React from "react";
 import {
   Label as LabelPrimitive,
   ProgressBar as ProgressPrimitive,
   type LabelProps,
   type ProgressBarProps as ProgressPrimitiveProps,
-} from "react-aria-components"
+} from "react-aria-components";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 type ProgressContextValue = {
-  percentage?: number
-  isIndeterminate: boolean
-  valueText?: string
-}
+  percentage?: number;
+  isIndeterminate: boolean;
+  valueText?: string;
+};
 
-const ProgressContext = React.createContext<ProgressContextValue | null>(null)
+const ProgressContext = React.createContext<ProgressContextValue | null>(null);
 
 function useProgress() {
-  const context = React.useContext(ProgressContext)
+  const context = React.useContext(ProgressContext);
   if (!context) {
-    throw new Error("useProgress must be used within a Progress.")
+    throw new Error("useProgress must be used within a Progress.");
   }
 
-  return context
+  return context;
 }
 
 function ProgressContent({
@@ -31,12 +31,12 @@ function ProgressContent({
   isIndeterminate,
   valueText,
 }: ProgressContextValue & {
-  children?: React.ReactNode
+  children?: React.ReactNode;
 }) {
   const context = React.useMemo(
     () => ({ percentage, isIndeterminate, valueText }),
-    [percentage, isIndeterminate, valueText]
-  )
+    [percentage, isIndeterminate, valueText],
+  );
 
   return (
     <ProgressContext value={context}>
@@ -45,7 +45,7 @@ function ProgressContent({
         <ProgressIndicator />
       </ProgressTrack>
     </ProgressContext>
-  )
+  );
 }
 
 function Progress({
@@ -53,8 +53,8 @@ function Progress({
   children,
   ...props
 }: Omit<ProgressPrimitiveProps, "children" | "className"> & {
-  children?: React.ReactNode
-  className?: string
+  children?: React.ReactNode;
+  className?: string;
 }) {
   return (
     <ProgressPrimitive
@@ -72,7 +72,7 @@ function Progress({
         </ProgressContent>
       )}
     </ProgressPrimitive>
-  )
+  );
 }
 
 function ProgressTrack({ className, ...props }: React.ComponentProps<"span">) {
@@ -80,20 +80,16 @@ function ProgressTrack({ className, ...props }: React.ComponentProps<"span">) {
     <span
       className={cn(
         "relative flex h-1 w-full items-center overflow-x-hidden rounded-full bg-muted",
-        className
+        className,
       )}
       data-slot="progress-track"
       {...props}
     />
-  )
+  );
 }
 
-function ProgressIndicator({
-  className,
-  style,
-  ...props
-}: React.ComponentProps<"span">) {
-  const { percentage, isIndeterminate } = useProgress()
+function ProgressIndicator({ className, style, ...props }: React.ComponentProps<"span">) {
+  const { percentage, isIndeterminate } = useProgress();
 
   return (
     <span
@@ -105,7 +101,7 @@ function ProgressIndicator({
       }}
       {...props}
     />
-  )
+  );
 }
 
 function ProgressLabel({ className, ...props }: LabelProps) {
@@ -115,7 +111,7 @@ function ProgressLabel({ className, ...props }: LabelProps) {
       data-slot="progress-label"
       {...props}
     />
-  )
+  );
 }
 
 function ProgressValue({
@@ -123,27 +119,18 @@ function ProgressValue({
   children,
   ...props
 }: Omit<React.ComponentProps<"span">, "children"> & {
-  children?: (value: string) => React.ReactNode
+  children?: (value: string) => React.ReactNode;
 }) {
-  const { valueText } = useProgress()
+  const { valueText } = useProgress();
   return (
     <span
-      className={cn(
-        "ml-auto text-sm text-muted-foreground tabular-nums",
-        className
-      )}
+      className={cn("ml-auto text-sm text-muted-foreground tabular-nums", className)}
       data-slot="progress-value"
       {...props}
     >
-      {children && valueText != null ? children(valueText) : valueText}
+      {children && valueText !== null && valueText !== undefined ? children(valueText) : valueText}
     </span>
-  )
+  );
 }
 
-export {
-  Progress,
-  ProgressTrack,
-  ProgressIndicator,
-  ProgressLabel,
-  ProgressValue,
-}
+export { Progress, ProgressTrack, ProgressIndicator, ProgressLabel, ProgressValue };

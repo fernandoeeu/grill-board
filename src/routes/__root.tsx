@@ -5,55 +5,51 @@ import {
   createRootRouteWithContext,
   useRouter,
   useRouterState,
-} from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
-import { RouterProvider as AriaRouterProvider } from 'react-aria-components'
+} from "@tanstack/react-router";
+import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { TanStackDevtools } from "@tanstack/react-devtools";
+import { RouterProvider as AriaRouterProvider } from "react-aria-components";
 
-import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
+import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 
-import { AppSidebar } from '@/components/app-sidebar'
-import { THEME_SCRIPT, ThemeProvider } from '@/components/theme-provider'
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from '@/components/ui/sidebar'
-import { Toaster } from '@/components/ui/sonner'
-import { topicsQueryOptions } from '@/lib/queries'
+import { AppSidebar } from "@/components/app-sidebar";
+import { THEME_SCRIPT, ThemeProvider } from "@/components/theme-provider";
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { Toaster } from "@/components/ui/sonner";
+import { topicsQueryOptions } from "@/lib/queries";
 
-import appCss from '../styles.css?url'
+import appCss from "../styles.css?url";
 
-import type { ReactNode } from 'react'
-import type { QueryClient } from '@tanstack/react-query'
+import type { ReactNode } from "react";
+import type { QueryClient } from "@tanstack/react-query";
 
 interface GrillRouterContext {
-  queryClient: QueryClient
+  queryClient: QueryClient;
 }
 
 export const Route = createRootRouteWithContext<GrillRouterContext>()({
   head: () => ({
     meta: [
-      { charSet: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { name: 'color-scheme', content: 'light dark' },
-      { title: 'Grill Board' },
+      { charSet: "utf-8" },
+      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "color-scheme", content: "light dark" },
+      { title: "Grill Board" },
     ],
-    links: [{ rel: 'stylesheet', href: appCss }],
+    links: [{ rel: "stylesheet", href: appCss }],
   }),
   // The sidebar lives in the shell, so its data is loaded once here and kept
   // fresh by the query's own poll interval.
   loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(topicsQueryOptions())
+    await context.queryClient.ensureQueryData(topicsQueryOptions());
   },
   shellComponent: RootDocument,
-})
+});
 
 function RootDocument({ children }: { children: ReactNode }) {
   // The landing is a fullscreen flyer: no sidebar shell, no app chrome.
   const isLanding = useRouterState({
-    select: (state) => state.location.pathname === '/landing',
-  })
+    select: (state) => state.location.pathname === "/landing",
+  });
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -91,7 +87,7 @@ function RootDocument({ children }: { children: ReactNode }) {
                 unstyled: true,
                 classNames: {
                   toast:
-                    'fade pointer-events-none mx-auto flex w-fit items-center justify-center gap-2 rounded-full bg-stone-900 px-5 py-2.5 text-sm font-medium text-white shadow-lg',
+                    "fade pointer-events-none mx-auto flex w-fit items-center justify-center gap-2 rounded-full bg-stone-900 px-5 py-2.5 text-sm font-medium text-white shadow-lg",
                 },
               }}
             />
@@ -99,11 +95,11 @@ function RootDocument({ children }: { children: ReactNode }) {
         </ThemeProvider>
         <TanStackDevtools
           config={{
-            position: 'bottom-right',
+            position: "bottom-right",
           }}
           plugins={[
             {
-              name: 'Tanstack Router',
+              name: "Tanstack Router",
               render: <TanStackRouterDevtoolsPanel />,
             },
             TanStackQueryDevtools,
@@ -112,7 +108,7 @@ function RootDocument({ children }: { children: ReactNode }) {
         <Scripts />
       </body>
     </html>
-  )
+  );
 }
 
 /**
@@ -120,15 +116,15 @@ function RootDocument({ children }: { children: ReactNode }) {
  * navigate with the router instead of reloading the document.
  */
 function AriaLinkBridge({ children }: { children: ReactNode }) {
-  const router = useRouter()
+  const router = useRouter();
 
   return (
     <AriaRouterProvider
       navigate={(href) => {
-        void router.navigate({ href })
+        void router.navigate({ href });
       }}
     >
       {children}
     </AriaRouterProvider>
-  )
+  );
 }

@@ -9,21 +9,17 @@
  * scrolls and stays inside the sidebar inset instead of over it.
  */
 
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
-import { draftAsText } from '@/components/board/answer-form';
-import {
-  ARMED_BUTTON,
-  PRIMARY_BUTTON,
-  SECONDARY_BUTTON,
-} from '@/components/board/button-styles';
-import { Button } from '@/components/ui/button';
-import { invalidateTopicQueries } from '@/lib/queries';
-import type { TopicDetail } from '@/lib/types';
-import { cn } from '@/lib/utils';
-import { clearDraftsFn } from '@/server/functions/grill';
+import { draftAsText } from "@/components/board/answer-form";
+import { ARMED_BUTTON, PRIMARY_BUTTON, SECONDARY_BUTTON } from "@/components/board/button-styles";
+import { Button } from "@/components/ui/button";
+import { invalidateTopicQueries } from "@/lib/queries";
+import type { TopicDetail } from "@/lib/types";
+import { cn } from "@/lib/utils";
+import { clearDraftsFn } from "@/server/functions/grill";
 
 /** How long the clear button stays armed before it disarms itself. */
 const ARM_WINDOW_MS = 4000;
@@ -34,16 +30,16 @@ const ARM_WINDOW_MS = 4000;
  * there is nothing to copy.
  */
 function buildMarkdown(topic: TopicDetail): string | null {
-  const lines = [`## Answers — ${topic.title}`, ''];
+  const lines = [`## Answers — ${topic.title}`, ""];
   let count = 0;
   for (const question of topic.questions) {
-    if (question.status !== 'open') continue;
+    if (question.status !== "open") continue;
     const answer = draftAsText(question.draft);
     if (!answer) continue;
     count += 1;
     lines.push(`- **${question.id}** (round ${question.roundNumber}): ${answer}`);
   }
-  return count > 0 ? lines.join('\n') : null;
+  return count > 0 ? lines.join("\n") : null;
 }
 
 export function ActionBar({ topic }: { topic: TopicDetail }) {
@@ -60,7 +56,7 @@ export function ActionBar({ topic }: { topic: TopicDetail }) {
 
   const markdown = useMemo(() => buildMarkdown(topic), [topic]);
   const hasDrafts = useMemo(
-    () => topic.questions.some((question) => draftAsText(question.draft) !== ''),
+    () => topic.questions.some((question) => draftAsText(question.draft) !== ""),
     [topic.questions],
   );
 
@@ -68,9 +64,9 @@ export function ActionBar({ topic }: { topic: TopicDetail }) {
     mutationFn: () => clearDraftsFn({ data: { topicId: topic.id } }),
     onSuccess: async () => {
       await invalidateTopicQueries(queryClient, topic.id);
-      toast('Drafts cleared.');
+      toast("Drafts cleared.");
     },
-    onError: () => toast('Could not clear the drafts.'),
+    onError: () => toast("Could not clear the drafts."),
   });
 
   function toggleClear() {
@@ -92,14 +88,14 @@ export function ActionBar({ topic }: { topic: TopicDetail }) {
 
   async function copyAnswers() {
     if (!markdown) {
-      toast('Nothing answered yet.');
+      toast("Nothing answered yet.");
       return;
     }
     try {
       await navigator.clipboard.writeText(markdown);
-      toast('Answers copied.');
+      toast("Answers copied.");
     } catch {
-      toast('Could not copy.');
+      toast("Could not copy.");
     }
   }
 
@@ -116,7 +112,7 @@ export function ActionBar({ topic }: { topic: TopicDetail }) {
           onPress={() => toggleClear()}
           className={cn(SECONDARY_BUTTON, armed && ARMED_BUTTON)}
         >
-          {armed ? 'Confirm clear' : 'Clear drafts'}
+          {armed ? "Confirm clear" : "Clear drafts"}
         </Button>
         <Button
           type="button"

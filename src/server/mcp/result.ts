@@ -8,7 +8,7 @@
  * a stack trace.
  */
 
-import { NotFoundError } from '@/server/db';
+import { NotFoundError } from "@/server/db";
 
 /**
  * The single text block a tool answers with.
@@ -18,19 +18,19 @@ import { NotFoundError } from '@/server/db';
  * makes it assignable.
  */
 export type ToolResult = {
-  content: Array<{ type: 'text'; text: string }>;
+  content: Array<{ type: "text"; text: string }>;
   isError?: boolean;
 };
 
 /** A failure an agent can act on: the message names the tool to call next. */
 export function fail(message: string): ToolResult {
-  return { isError: true, content: [{ type: 'text', text: message }] };
+  return { isError: true, content: [{ type: "text", text: message }] };
 }
 
 /** Runs one data-access call and hands its already-formatted text back. */
 export function textResult(produce: () => string): ToolResult {
   try {
-    return { content: [{ type: 'text', text: produce() }] };
+    return { content: [{ type: "text", text: produce() }] };
   } catch (error) {
     return failure(error);
   }
@@ -48,9 +48,9 @@ function failure(error: unknown): ToolResult {
   if (error instanceof Error) {
     // Not a lookup failure, so it is either bad input or a real defect. Log the
     // stack for the operator; give the agent the message alone.
-    console.error('[mcp] tool failed:', error);
+    console.error("[mcp] tool failed:", error);
     return fail(error.message);
   }
-  console.error('[mcp] tool failed:', error);
-  return fail('the tool failed for an unknown reason; call get_topic to re-read the state');
+  console.error("[mcp] tool failed:", error);
+  return fail("the tool failed for an unknown reason; call get_topic to re-read the state");
 }

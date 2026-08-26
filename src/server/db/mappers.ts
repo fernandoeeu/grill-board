@@ -6,7 +6,7 @@ import type {
   Round,
   RoundKind,
   TopicStatus,
-} from '@/lib/types';
+} from "@/lib/types";
 
 /**
  * Row shapes and row-to-domain mappers.
@@ -102,22 +102,22 @@ function parseOptions(value: string | null): string[] | undefined {
   if (value === null) return undefined;
   const parsed = parseJson(value);
   if (!Array.isArray(parsed)) return undefined;
-  return parsed.filter((item): item is string => typeof item === 'string');
+  return parsed.filter((item): item is string => typeof item === "string");
 }
 
 function parseDraft(value: string | null): Draft | undefined {
   if (value === null) return undefined;
   const parsed = parseJson(value);
-  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) return undefined;
+  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) return undefined;
 
   const raw = parsed as Record<string, unknown>;
-  const option = typeof raw.option === 'string' ? raw.option : '';
-  const text = typeof raw.text === 'string' ? raw.text : '';
-  if (option === '' && text === '') return undefined;
+  const option = typeof raw.option === "string" ? raw.option : "";
+  const text = typeof raw.text === "string" ? raw.text : "";
+  if (option === "" && text === "") return undefined;
 
   return {
-    ...(option === '' ? {} : { option }),
-    ...(text === '' ? {} : { text }),
+    ...(option === "" ? {} : { option }),
+    ...(text === "" ? {} : { text }),
   };
 }
 

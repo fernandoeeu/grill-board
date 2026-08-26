@@ -10,39 +10,39 @@
    every component in src/components/ui/* depends on it.
 --------------------------------------------------------------------------- */
 @theme inline {
-    --font-heading: var(--font-sans);
-    --color-sidebar-ring: var(--sidebar-ring);
-    --color-sidebar-border: var(--sidebar-border);
-    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-    --color-sidebar-accent: var(--sidebar-accent);
-    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-    --color-sidebar-primary: var(--sidebar-primary);
-    --color-sidebar-foreground: var(--sidebar-foreground);
-    --color-sidebar: var(--sidebar);
-    --color-chart-5: var(--chart-5);
-    --color-chart-4: var(--chart-4);
-    --color-chart-3: var(--chart-3);
-    --color-chart-2: var(--chart-2);
-    --color-chart-1: var(--chart-1);
-    --color-ring: var(--ring);
-    --color-input: var(--input);
-    --color-border: var(--border);
-    --color-destructive: var(--destructive);
-    --color-accent-foreground: var(--accent-foreground);
-    --color-accent: var(--accent);
-    --color-muted-foreground: var(--muted-foreground);
-    --color-muted: var(--muted);
-    --color-secondary-foreground: var(--secondary-foreground);
-    --color-secondary: var(--secondary);
-    --color-primary-foreground: var(--primary-foreground);
-    --color-primary: var(--primary);
-    --color-popover-foreground: var(--popover-foreground);
-    --color-popover: var(--popover);
-    --color-card-foreground: var(--card-foreground);
-    --color-card: var(--card);
-    --color-foreground: var(--foreground);
-    --color-background: var(--background);
-    /* The `--radius-*` scale is deliberately NOT remapped here. shadcn's init
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  /* The `--radius-*` scale is deliberately NOT remapped here. shadcn's init
        rescales it from `--radius`, which pushed every corner 2px past spec 4
        (rounded-xl 14px instead of 12px, rounded-lg 10px instead of 8px). The
        spec quotes plain Tailwind names, so the plain Tailwind scale wins. */
@@ -54,57 +54,57 @@
    the font stack is the system stack, so there is no webfont to load.
 --------------------------------------------------------------------------- */
 @theme {
-    --color-accent-50: oklch(0.97 0.014 254);
-    --color-accent-100: oklch(0.94 0.03 254);
-    --color-accent-200: oklch(0.88 0.055 254);
-    --color-accent-600: oklch(0.52 0.16 254);
-    --color-accent-700: oklch(0.45 0.15 254);
-    --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --color-accent-50: oklch(0.97 0.014 254);
+  --color-accent-100: oklch(0.94 0.03 254);
+  --color-accent-200: oklch(0.88 0.055 254);
+  --color-accent-600: oklch(0.52 0.16 254);
+  --color-accent-700: oklch(0.45 0.15 254);
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 /* ---------------------------------------------------------------------------
    Light theme (default).
 --------------------------------------------------------------------------- */
 :root {
-    color-scheme: light;
+  color-scheme: light;
 
-    --background: oklch(1 0 0); /* white */
-    --foreground: oklch(0.216 0.006 56.043); /* stone-900 */
-    --card: oklch(1 0 0); /* white */
-    --card-foreground: oklch(0.216 0.006 56.043); /* stone-900 */
-    --popover: oklch(1 0 0); /* white */
-    --popover-foreground: oklch(0.216 0.006 56.043); /* stone-900 */
-    --primary: var(--color-accent-600);
-    --primary-foreground: oklch(1 0 0); /* white */
-    --secondary: oklch(0.97 0.001 106.424); /* stone-100 */
-    --secondary-foreground: oklch(0.216 0.006 56.043); /* stone-900 */
-    --muted: oklch(0.97 0.001 106.424); /* stone-100 */
-    --muted-foreground: oklch(0.553 0.013 58.071); /* stone-500 */
-    --accent: var(--color-accent-50); /* shadcn hover tint -> accent-50 */
-    --accent-foreground: var(--color-accent-700);
-    --destructive: oklch(0.577 0.245 27.325); /* red-600 */
-    --border: oklch(0.923 0.003 48.717); /* stone-200 */
-    --input: oklch(0.923 0.003 48.717); /* stone-200 */
-    --ring: var(--color-accent-600);
+  --background: oklch(1 0 0); /* white */
+  --foreground: oklch(0.216 0.006 56.043); /* stone-900 */
+  --card: oklch(1 0 0); /* white */
+  --card-foreground: oklch(0.216 0.006 56.043); /* stone-900 */
+  --popover: oklch(1 0 0); /* white */
+  --popover-foreground: oklch(0.216 0.006 56.043); /* stone-900 */
+  --primary: var(--color-accent-600);
+  --primary-foreground: oklch(1 0 0); /* white */
+  --secondary: oklch(0.97 0.001 106.424); /* stone-100 */
+  --secondary-foreground: oklch(0.216 0.006 56.043); /* stone-900 */
+  --muted: oklch(0.97 0.001 106.424); /* stone-100 */
+  --muted-foreground: oklch(0.553 0.013 58.071); /* stone-500 */
+  --accent: var(--color-accent-50); /* shadcn hover tint -> accent-50 */
+  --accent-foreground: var(--color-accent-700);
+  --destructive: oklch(0.577 0.245 27.325); /* red-600 */
+  --border: oklch(0.923 0.003 48.717); /* stone-200 */
+  --input: oklch(0.923 0.003 48.717); /* stone-200 */
+  --ring: var(--color-accent-600);
 
-    --chart-1: var(--color-accent-600);
-    --chart-2: var(--color-accent-200);
-    --chart-3: oklch(0.374 0.01 67.558); /* stone-700 */
-    --chart-4: oklch(0.709 0.01 56.259); /* stone-400 */
-    --chart-5: oklch(0.869 0.005 56.366); /* stone-300 */
+  --chart-1: var(--color-accent-600);
+  --chart-2: var(--color-accent-200);
+  --chart-3: oklch(0.374 0.01 67.558); /* stone-700 */
+  --chart-4: oklch(0.709 0.01 56.259); /* stone-400 */
+  --chart-5: oklch(0.869 0.005 56.366); /* stone-300 */
 
-    /* Kept only for the few shadcn components that read `--radius` directly;
+  /* Kept only for the few shadcn components that read `--radius` directly;
        set to Tailwind's `rounded-lg` (spec 4) so both agree. */
-    --radius: 0.5rem;
+  --radius: 0.5rem;
 
-    --sidebar: oklch(0.955 0.002 106.423); /* recessed rail behind the card */
-    --sidebar-foreground: oklch(0.216 0.006 56.043); /* stone-900 */
-    --sidebar-primary: var(--color-accent-600);
-    --sidebar-primary-foreground: oklch(1 0 0); /* white */
-    --sidebar-accent: var(--color-accent-50); /* active topic row */
-    --sidebar-accent-foreground: var(--color-accent-700);
-    --sidebar-border: oklch(0.923 0.003 48.717); /* stone-200 */
-    --sidebar-ring: var(--color-accent-600);
+  --sidebar: oklch(0.955 0.002 106.423); /* recessed rail behind the card */
+  --sidebar-foreground: oklch(0.216 0.006 56.043); /* stone-900 */
+  --sidebar-primary: var(--color-accent-600);
+  --sidebar-primary-foreground: oklch(1 0 0); /* white */
+  --sidebar-accent: var(--color-accent-50); /* active topic row */
+  --sidebar-accent-foreground: var(--color-accent-700);
+  --sidebar-border: oklch(0.923 0.003 48.717); /* stone-200 */
+  --sidebar-ring: var(--color-accent-600);
 }
 
 /* ---------------------------------------------------------------------------
@@ -125,116 +125,116 @@
    affects only our own hand-styled surfaces.
 --------------------------------------------------------------------------- */
 .dark {
-    color-scheme: dark;
+  color-scheme: dark;
 
-    /* Neutral scale, inverted and tuned for legibility on a dark page. */
-    --color-white: oklch(0.216 0.006 56.043); /* card / header / input surface */
-    --color-stone-50: oklch(0.255 0.006 40); /* recorded-answer panel, hover fill */
-    --color-stone-100: oklch(0.275 0.006 40); /* hairlines, progress track */
-    --color-stone-200: oklch(0.32 0.007 40); /* card ring, borders */
-    --color-stone-300: oklch(0.42 0.008 45); /* separators, placeholders */
-    --color-stone-400: oklch(0.58 0.011 58); /* notes, meta, saved flash */
-    --color-stone-500: oklch(0.68 0.012 58); /* category headings, context */
-    --color-stone-600: oklch(0.76 0.01 58); /* recommendation body, chip text */
-    --color-stone-700: oklch(0.84 0.007 57); /* answer body, pill idle text */
-    --color-stone-800: oklch(0.9 0.005 57); /* textarea text, primary hover */
-    --color-stone-900: oklch(0.97 0.001 106.424); /* titles, primary/toast fill */
-    --color-stone-950: oklch(0.985 0.001 106.423);
+  /* Neutral scale, inverted and tuned for legibility on a dark page. */
+  --color-white: oklch(0.216 0.006 56.043); /* card / header / input surface */
+  --color-stone-50: oklch(0.255 0.006 40); /* recorded-answer panel, hover fill */
+  --color-stone-100: oklch(0.275 0.006 40); /* hairlines, progress track */
+  --color-stone-200: oklch(0.32 0.007 40); /* card ring, borders */
+  --color-stone-300: oklch(0.42 0.008 45); /* separators, placeholders */
+  --color-stone-400: oklch(0.58 0.011 58); /* notes, meta, saved flash */
+  --color-stone-500: oklch(0.68 0.012 58); /* category headings, context */
+  --color-stone-600: oklch(0.76 0.01 58); /* recommendation body, chip text */
+  --color-stone-700: oklch(0.84 0.007 57); /* answer body, pill idle text */
+  --color-stone-800: oklch(0.9 0.005 57); /* textarea text, primary hover */
+  --color-stone-900: oklch(0.97 0.001 106.424); /* titles, primary/toast fill */
+  --color-stone-950: oklch(0.985 0.001 106.423);
 
-    /* Accent: same hue 254. 600 stays the fill, 700 stays the label colour,
+  /* Accent: same hue 254. 600 stays the fill, 700 stays the label colour,
        so in dark 700 is the lighter of the two. */
-    --color-accent-50: oklch(0.3 0.05 254); /* tinted panel / open badge */
-    --color-accent-100: oklch(0.38 0.08 254); /* ::selection */
-    --color-accent-200: oklch(0.48 0.1 254); /* panel border, badge ring */
-    --color-accent-600: oklch(0.66 0.15 254); /* fills, bar, focus ring */
-    --color-accent-700: oklch(0.8 0.09 254); /* labels, badge text */
+  --color-accent-50: oklch(0.3 0.05 254); /* tinted panel / open badge */
+  --color-accent-100: oklch(0.38 0.08 254); /* ::selection */
+  --color-accent-200: oklch(0.48 0.1 254); /* panel border, badge ring */
+  --color-accent-600: oklch(0.66 0.15 254); /* fills, bar, focus ring */
+  --color-accent-700: oklch(0.8 0.09 254); /* labels, badge text */
 
-    /* Status badge families, dark-legible. */
-    --color-emerald-50: oklch(0.3 0.05 162);
-    --color-emerald-200: oklch(0.46 0.09 162);
-    --color-emerald-700: oklch(0.8 0.12 162);
-    --color-amber-50: oklch(0.3 0.045 75);
-    --color-amber-200: oklch(0.46 0.08 75);
-    --color-amber-700: oklch(0.83 0.12 82);
+  /* Status badge families, dark-legible. */
+  --color-emerald-50: oklch(0.3 0.05 162);
+  --color-emerald-200: oklch(0.46 0.09 162);
+  --color-emerald-700: oklch(0.8 0.12 162);
+  --color-amber-50: oklch(0.3 0.045 75);
+  --color-amber-200: oklch(0.46 0.08 75);
+  --color-amber-700: oklch(0.83 0.12 82);
 
-    /* Armed-destructive button. */
-    --color-red-50: oklch(0.3 0.06 25);
-    --color-red-100: oklch(0.35 0.08 25);
-    --color-red-300: oklch(0.48 0.12 25);
-    --color-red-700: oklch(0.8 0.13 22);
+  /* Armed-destructive button. */
+  --color-red-50: oklch(0.3 0.06 25);
+  --color-red-100: oklch(0.35 0.08 25);
+  --color-red-300: oklch(0.48 0.12 25);
+  --color-red-700: oklch(0.8 0.13 22);
 
-    /* Semantic tokens. Written out rather than derived, because the page is
+  /* Semantic tokens. Written out rather than derived, because the page is
        stone-950 while `--color-white` is now the stone-900 card. */
-    --background: oklch(0.147 0.004 49.25); /* stone-950 */
-    --foreground: oklch(0.97 0.001 106.424); /* stone-100 */
-    --card: oklch(0.216 0.006 56.043); /* stone-900 */
-    --card-foreground: oklch(0.97 0.001 106.424); /* stone-100 */
-    --popover: oklch(0.216 0.006 56.043); /* stone-900 */
-    --popover-foreground: oklch(0.97 0.001 106.424); /* stone-100 */
-    --primary: var(--color-accent-600);
-    --primary-foreground: oklch(0.18 0.006 56.043);
-    --secondary: oklch(0.275 0.006 40); /* stone-800 */
-    --secondary-foreground: oklch(0.97 0.001 106.424);
-    --muted: oklch(0.275 0.006 40); /* stone-800 */
-    --muted-foreground: oklch(0.68 0.012 58); /* stone-500 */
-    --accent: var(--color-accent-50);
-    --accent-foreground: var(--color-accent-700);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(0.32 0.007 40); /* stone-800 hairline */
-    --input: oklch(0.32 0.007 40);
-    --ring: var(--color-accent-600);
+  --background: oklch(0.147 0.004 49.25); /* stone-950 */
+  --foreground: oklch(0.97 0.001 106.424); /* stone-100 */
+  --card: oklch(0.216 0.006 56.043); /* stone-900 */
+  --card-foreground: oklch(0.97 0.001 106.424); /* stone-100 */
+  --popover: oklch(0.216 0.006 56.043); /* stone-900 */
+  --popover-foreground: oklch(0.97 0.001 106.424); /* stone-100 */
+  --primary: var(--color-accent-600);
+  --primary-foreground: oklch(0.18 0.006 56.043);
+  --secondary: oklch(0.275 0.006 40); /* stone-800 */
+  --secondary-foreground: oklch(0.97 0.001 106.424);
+  --muted: oklch(0.275 0.006 40); /* stone-800 */
+  --muted-foreground: oklch(0.68 0.012 58); /* stone-500 */
+  --accent: var(--color-accent-50);
+  --accent-foreground: var(--color-accent-700);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(0.32 0.007 40); /* stone-800 hairline */
+  --input: oklch(0.32 0.007 40);
+  --ring: var(--color-accent-600);
 
-    --chart-1: var(--color-accent-600);
-    --chart-2: var(--color-accent-200);
-    --chart-3: oklch(0.84 0.007 57);
-    --chart-4: oklch(0.58 0.011 58);
-    --chart-5: oklch(0.42 0.008 45);
+  --chart-1: var(--color-accent-600);
+  --chart-2: var(--color-accent-200);
+  --chart-3: oklch(0.84 0.007 57);
+  --chart-4: oklch(0.58 0.011 58);
+  --chart-5: oklch(0.42 0.008 45);
 
-    /* Inset relief: the outer rail sits below the page, so the content card
+  /* Inset relief: the outer rail sits below the page, so the content card
        reads as raised. Keep it darker than `--background`. */
-    --sidebar: oklch(0.115 0.004 52);
-    --sidebar-foreground: oklch(0.97 0.001 106.424);
-    --sidebar-primary: var(--color-accent-600);
-    --sidebar-primary-foreground: oklch(0.18 0.006 56.043);
-    --sidebar-accent: var(--color-accent-50);
-    --sidebar-accent-foreground: var(--color-accent-700);
-    --sidebar-border: oklch(0.28 0.006 40);
-    --sidebar-ring: var(--color-accent-600);
+  --sidebar: oklch(0.115 0.004 52);
+  --sidebar-foreground: oklch(0.97 0.001 106.424);
+  --sidebar-primary: var(--color-accent-600);
+  --sidebar-primary-foreground: oklch(0.18 0.006 56.043);
+  --sidebar-accent: var(--color-accent-50);
+  --sidebar-accent-foreground: var(--color-accent-700);
+  --sidebar-border: oklch(0.28 0.006 40);
+  --sidebar-ring: var(--color-accent-600);
 }
 
 @layer base {
-    * {
-        @apply border-border outline-ring/50;
-    }
-    body {
-        @apply bg-background text-foreground;
-    }
-    html {
-        @apply font-sans;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        scroll-behavior: smooth;
-    }
-    ::selection {
-        background-color: var(--color-accent-100);
-    }
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+  ::selection {
+    background-color: var(--color-accent-100);
+  }
 }
 
 @layer utilities {
-    /* Short, discreet transition used on option pills, saved flashes, toasts. */
-    .fade {
-        transition:
-            opacity 220ms ease,
-            transform 220ms ease,
-            background-color 220ms ease,
-            color 220ms ease;
-    }
+  /* Short, discreet transition used on option pills, saved flashes, toasts. */
+  .fade {
+    transition:
+      opacity 220ms ease,
+      transform 220ms ease,
+      background-color 220ms ease,
+      color 220ms ease;
+  }
 }
 
 html,
 body,
 #app {
-    min-height: 100%;
+  min-height: 100%;
 }
 
 /* ===========================================================================
@@ -245,13 +245,13 @@ body,
    scoped to `.landing`, so nothing here leaks into the board.
 =========================================================================== */
 @theme {
-    /* Landing-only tokens. `--font-display` is the Black Ops One stencil the
+  /* Landing-only tokens. `--font-display` is the Black Ops One stencil the
        landing route loads from Google Fonts (display=swap). */
-    --font-display: "Black Ops One", "Arial Black", ui-sans-serif, sans-serif;
-    --color-paper: oklch(0.957 0.005 95); /* photocopy off-white */
-    --color-ink: oklch(0.19 0.003 68); /* toner black */
-    --color-bone: oklch(0.995 0 0); /* raw paper scraps */
-    --color-blood: oklch(0.505 0.192 27.5); /* the one accent */
+  --font-display: "Black Ops One", "Arial Black", ui-sans-serif, sans-serif;
+  --color-paper: oklch(0.957 0.005 95); /* photocopy off-white */
+  --color-ink: oklch(0.19 0.003 68); /* toner black */
+  --color-bone: oklch(0.995 0 0); /* raw paper scraps */
+  --color-blood: oklch(0.505 0.192 27.5); /* the one accent */
 }
 
 /* Language toggle. Default is EN; the inline LANG_SCRIPT stamps
@@ -259,242 +259,231 @@ body,
    languages ship in the DOM, so switching is pure CSS — no flash, no refetch. */
 html[data-lang="pt"] .landing [data-lang-en],
 html:not([data-lang="pt"]) .landing [data-lang-pt] {
-    display: none !important;
+  display: none !important;
 }
 
 .landing {
-    --ease-zap: cubic-bezier(0.23, 1, 0.32, 1);
-    /* Patchy ink for stamps: pinholes from two gradient layers on prime-ish
+  --ease-zap: cubic-bezier(0.23, 1, 0.32, 1);
+  /* Patchy ink for stamps: pinholes from two gradient layers on prime-ish
        tiles, intersected. (An SVG feTurbulence mask looked better but crashes
        Chrome's compositor on scroll — gradients only here.) */
-    --stamp-mask:
-        radial-gradient(circle at 34% 42%, transparent 0.7px, black 1.3px),
-        radial-gradient(circle at 71% 23%, transparent 0.8px, black 1.5px);
-    background-color: var(--color-paper);
-    color: var(--color-ink);
-    color-scheme: light;
+  --stamp-mask:
+    radial-gradient(circle at 34% 42%, transparent 0.7px, black 1.3px),
+    radial-gradient(circle at 71% 23%, transparent 0.8px, black 1.5px);
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  color-scheme: light;
 }
 
 .landing ::selection {
-    background-color: var(--color-blood);
-    color: var(--color-bone);
+  background-color: var(--color-blood);
+  color: var(--color-bone);
 }
 
 /* Xerox grain over the whole page: three dot layers on prime tiles — the
    overlap never repeats visibly, so it reads as photocopy noise. Kept as pure
    CSS gradients: SVG feTurbulence here crashes Chrome's compositor on scroll. */
 .landing-grain {
-    position: fixed;
-    inset: 0;
-    z-index: 60;
-    pointer-events: none;
-    background-image:
-        radial-gradient(rgb(20 18 12 / 0.055) 1px, transparent 1px),
-        radial-gradient(rgb(20 18 12 / 0.045) 1px, transparent 1px),
-        radial-gradient(rgb(255 255 255 / 0.05) 1px, transparent 1px);
-    background-size:
-        3px 5px,
-        7px 3px,
-        5px 7px;
-    background-position:
-        0 0,
-        1px 2px,
-        3px 1px;
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  background-image:
+    radial-gradient(rgb(20 18 12 / 0.055) 1px, transparent 1px),
+    radial-gradient(rgb(20 18 12 / 0.045) 1px, transparent 1px),
+    radial-gradient(rgb(255 255 255 / 0.05) 1px, transparent 1px);
+  background-size:
+    3px 5px,
+    7px 3px,
+    5px 7px;
+  background-position:
+    0 0,
+    1px 2px,
+    3px 1px;
 }
 
 /* --- rubber stamps ------------------------------------------------------ */
 .landing .stamp {
-    display: inline-block;
-    font-family: var(--font-display);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    line-height: 1;
-    border: 3px solid currentColor;
-    padding: 0.32em 0.5em 0.24em;
-    mask-image: var(--stamp-mask);
-    mask-size:
-        4.3px 4.7px,
-        6.1px 5.3px;
-    mask-composite: intersect;
-    rotate: var(--stamp-r, -4deg);
-    /* Slams in once its `[data-inked]` ancestor scrolls into view. */
-    opacity: 0;
-    transform: scale(1.15);
-    transition:
-        opacity 180ms var(--ease-zap),
-        transform 180ms var(--ease-zap);
-    transition-delay: var(--ink-d, 0ms);
+  display: inline-block;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  border: 3px solid currentColor;
+  padding: 0.32em 0.5em 0.24em;
+  mask-image: var(--stamp-mask);
+  mask-size:
+    4.3px 4.7px,
+    6.1px 5.3px;
+  mask-composite: intersect;
+  rotate: var(--stamp-r, -4deg);
+  /* Slams in once its `[data-inked]` ancestor scrolls into view. */
+  opacity: 0;
+  transform: scale(1.15);
+  transition:
+    opacity 180ms var(--ease-zap),
+    transform 180ms var(--ease-zap);
+  transition-delay: var(--ink-d, 0ms);
 }
 .landing [data-inked] .stamp {
-    opacity: 1;
-    transform: scale(1);
+  opacity: 1;
+  transform: scale(1);
 }
 .landing .stamp-blood {
-    color: var(--color-blood);
+  color: var(--color-blood);
 }
 
 /* --- scroll-in for plain blocks (steps, cards) -------------------------- */
 .landing .rise {
-    opacity: 0;
-    transform: translateY(14px);
-    transition:
-        opacity 260ms var(--ease-zap),
-        transform 260ms var(--ease-zap);
-    transition-delay: var(--ink-d, 0ms);
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 260ms var(--ease-zap),
+    transform 260ms var(--ease-zap);
+  transition-delay: var(--ink-d, 0ms);
 }
 .landing [data-inked] .rise {
-    opacity: 1;
-    transform: translateY(0);
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* --- hero mask-reveal, word by word ------------------------------------- */
 .landing .wmask {
-    display: inline-block;
-    overflow: hidden;
-    vertical-align: bottom;
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
 }
 .landing .w {
-    display: inline-block;
-    transform: translateY(112%);
-    animation: landing-word-in 280ms var(--ease-zap) var(--w-d, 0ms) forwards;
+  display: inline-block;
+  transform: translateY(112%);
+  animation: landing-word-in 280ms var(--ease-zap) var(--w-d, 0ms) forwards;
 }
 @keyframes landing-word-in {
-    to {
-        transform: translateY(0);
-    }
+  to {
+    transform: translateY(0);
+  }
 }
 @keyframes landing-word-fade {
-    to {
-        opacity: 1;
-    }
+  to {
+    opacity: 1;
+  }
 }
 
 /* --- adhesive tape (pure CSS) ------------------------------------------- */
 .landing .tape {
-    position: absolute;
-    width: 6.5rem;
-    height: 1.7rem;
-    background:
-        repeating-linear-gradient(
-            90deg,
-            rgb(255 255 255 / 0.14) 0 6px,
-            transparent 6px 12px
-        ),
-        rgb(240 234 216 / 0.62);
-    box-shadow: 0 1px 3px rgb(0 0 0 / 0.14);
-    clip-path: polygon(2% 0, 98% 5%, 100% 24%, 97% 100%, 3% 95%, 0 76%);
-    rotate: var(--tape-r, -40deg);
-    pointer-events: none;
+  position: absolute;
+  width: 6.5rem;
+  height: 1.7rem;
+  background:
+    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.14) 0 6px, transparent 6px 12px),
+    rgb(240 234 216 / 0.62);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.14);
+  clip-path: polygon(2% 0, 98% 5%, 100% 24%, 97% 100%, 3% 95%, 0 76%);
+  rotate: var(--tape-r, -40deg);
+  pointer-events: none;
 }
 
 /* --- pasted paper scraps ------------------------------------------------- */
 .landing .cutout {
-    background-color: var(--color-bone);
-    box-shadow: 0 2px 10px rgb(0 0 0 / 0.15);
-    rotate: var(--cut-r, -1deg);
-    transition: rotate 180ms var(--ease-zap);
+  background-color: var(--color-bone);
+  box-shadow: 0 2px 10px rgb(0 0 0 / 0.15);
+  rotate: var(--cut-r, -1deg);
+  transition: rotate 180ms var(--ease-zap);
 }
 @media (hover: hover) and (pointer: fine) {
-    .landing .cutout:hover {
-        rotate: var(--cut-r2, 0.4deg);
-    }
+  .landing .cutout:hover {
+    rotate: var(--cut-r2, 0.4deg);
+  }
 }
 
 /* --- ransom-note strip --------------------------------------------------- */
 .landing .ransom > span {
-    display: inline-block;
-    padding: 0.1em 0.32em 0.06em;
-    margin: 0.12em 0.1em;
-    font-weight: 700;
+  display: inline-block;
+  padding: 0.1em 0.32em 0.06em;
+  margin: 0.12em 0.1em;
+  font-weight: 700;
 }
 .landing .ransom > span:nth-child(3n + 1) {
-    background-color: var(--color-ink);
-    color: var(--color-bone);
-    rotate: -1.6deg;
+  background-color: var(--color-ink);
+  color: var(--color-bone);
+  rotate: -1.6deg;
 }
 .landing .ransom > span:nth-child(3n + 2) {
-    background-color: var(--color-bone);
-    outline: 2px solid var(--color-ink);
-    outline-offset: -2px;
-    rotate: 1.2deg;
+  background-color: var(--color-bone);
+  outline: 2px solid var(--color-ink);
+  outline-offset: -2px;
+  rotate: 1.2deg;
 }
 .landing .ransom > span:nth-child(3n) {
-    background-color: var(--color-blood);
-    color: var(--color-bone);
-    rotate: -0.8deg;
+  background-color: var(--color-blood);
+  color: var(--color-bone);
+  rotate: -0.8deg;
 }
 
 /* --- odds and ends -------------------------------------------------------- */
 .landing .mark-blood {
-    background-color: var(--color-blood);
-    color: var(--color-bone);
-    padding: 0 0.3em 0.06em;
-    box-decoration-break: clone;
-    -webkit-box-decoration-break: clone;
+  background-color: var(--color-blood);
+  color: var(--color-bone);
+  padding: 0 0.3em 0.06em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
 }
 .landing .barcode {
-    height: 2.4rem;
-    background: repeating-linear-gradient(
-        90deg,
-        currentColor 0 2px,
-        transparent 2px 5px,
-        currentColor 5px 8px,
-        transparent 8px 10px,
-        currentColor 10px 11px,
-        transparent 11px 15px
-    );
+  height: 2.4rem;
+  background: repeating-linear-gradient(
+    90deg,
+    currentColor 0 2px,
+    transparent 2px 5px,
+    currentColor 5px 8px,
+    transparent 8px 10px,
+    currentColor 10px 11px,
+    transparent 11px 15px
+  );
 }
 .landing .halftone {
-    background-image: radial-gradient(
-        currentColor 1px,
-        transparent 1.4px
-    );
-    background-size: 7px 7px;
+  background-image: radial-gradient(currentColor 1px, transparent 1.4px);
+  background-size: 7px 7px;
 }
 .landing .spotlight {
-    background: radial-gradient(
-        ellipse 55% 42% at 50% 34%,
-        rgb(255 255 255 / 0.15),
-        transparent 72%
-    );
+  background: radial-gradient(ellipse 55% 42% at 50% 34%, rgb(255 255 255 / 0.15), transparent 72%);
 }
 /* Press feedback (React Aria sets data-pressed). */
 .landing .press {
-    transition: transform 140ms var(--ease-zap);
+  transition: transform 140ms var(--ease-zap);
 }
 .landing .press[data-pressed] {
-    transform: scale(0.96);
+  transform: scale(0.96);
 }
 /* EN|PT stamp pair: the active language reads as freshly inked. */
 .landing .lang-btn {
-    font-family: var(--font-display);
-    border: 2px solid var(--color-ink);
-    padding: 0.22em 0.5em 0.16em;
-    line-height: 1;
-    cursor: pointer;
-    color: var(--color-ink);
-    background-color: transparent;
+  font-family: var(--font-display);
+  border: 2px solid var(--color-ink);
+  padding: 0.22em 0.5em 0.16em;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--color-ink);
+  background-color: transparent;
 }
 html:not([data-lang="pt"]) .landing .lang-btn-en,
 html[data-lang="pt"] .landing .lang-btn-pt {
-    background-color: var(--color-ink);
-    color: var(--color-bone);
+  background-color: var(--color-ink);
+  color: var(--color-bone);
 }
 
 /* Reduced motion: everything becomes a plain fade — no travel, no scale. */
 @media (prefers-reduced-motion: reduce) {
-    .landing .stamp,
-    .landing [data-inked] .stamp,
-    .landing .rise,
-    .landing [data-inked] .rise {
-        transform: none;
-    }
-    .landing .w {
-        transform: none;
-        opacity: 0;
-        animation-name: landing-word-fade;
-    }
-    .landing .cutout {
-        transition: none;
-    }
+  .landing .stamp,
+  .landing [data-inked] .stamp,
+  .landing .rise,
+  .landing [data-inked] .rise {
+    transform: none;
+  }
+  .landing .w {
+    transform: none;
+    opacity: 0;
+    animation-name: landing-word-fade;
+  }
+  .landing .cutout {
+    transition: none;
+  }
 }

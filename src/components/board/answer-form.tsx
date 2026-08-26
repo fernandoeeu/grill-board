@@ -7,18 +7,18 @@
  * into the recorded answer, with `answeredVia: 'board'`.
  */
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
-import { PRIMARY_BUTTON } from '@/components/board/button-styles';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { invalidateTopicQueries } from '@/lib/queries';
-import type { Draft, Question } from '@/lib/types';
-import { cn } from '@/lib/utils';
-import { answerQuestionFn, saveDraftFn } from '@/server/functions/grill';
+import { PRIMARY_BUTTON } from "@/components/board/button-styles";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { invalidateTopicQueries } from "@/lib/queries";
+import type { Draft, Question } from "@/lib/types";
+import { cn } from "@/lib/utils";
+import { answerQuestionFn, saveDraftFn } from "@/server/functions/grill";
 
 /** Debounce of the free-text field. A pill click does not wait. */
 const DRAFT_DEBOUNCE_MS = 400;
@@ -30,38 +30,31 @@ const PILL_BASE =
   // `max-w-full` + wrapping text keep a long option inside the card: the shadcn
   // button base is `shrink-0 whitespace-nowrap`, which would otherwise widen the
   // page instead of breaking the label.
-  'fade h-auto max-w-full min-w-0 shrink cursor-pointer rounded-full border px-4 py-2 text-left text-sm font-medium break-words whitespace-normal';
+  "fade h-auto max-w-full min-w-0 shrink cursor-pointer rounded-full border px-4 py-2 text-left text-sm font-medium break-words whitespace-normal";
 
-const PILL_ACTIVE =
-  'border-accent-600 bg-accent-600 text-white shadow-sm hover:bg-accent-600';
+const PILL_ACTIVE = "border-accent-600 bg-accent-600 text-white shadow-sm hover:bg-accent-600";
 
 const PILL_IDLE =
-  'border-stone-200 bg-white text-stone-700 hover:border-stone-300 hover:bg-stone-50 hover:text-stone-700';
+  "border-stone-200 bg-white text-stone-700 hover:border-stone-300 hover:bg-stone-50 hover:text-stone-700";
 
 /** Idle look of the pill the agent recommends: quietly accent-tinted. */
 const PILL_RECOMMENDED =
-  'border-accent-200 bg-accent-50/60 text-stone-700 hover:border-accent-300 hover:bg-accent-50 hover:text-stone-700';
+  "border-accent-200 bg-accent-50/60 text-stone-700 hover:border-accent-300 hover:bg-accent-50 hover:text-stone-700";
 
 /**
  * Flattens a draft into the one sentence it stands for: picked option first,
  * free text second, joined by a spaced em dash. Empty when the draft is empty.
  */
 export function draftAsText(draft: Draft | undefined): string {
-  if (!draft) return '';
-  return [draft.option, draft.text?.trim()].filter(Boolean).join(' — ');
+  if (!draft) return "";
+  return [draft.option, draft.text?.trim()].filter(Boolean).join(" — ");
 }
 
-export function AnswerForm({
-  topicId,
-  question,
-}: {
-  topicId: string;
-  question: Question;
-}) {
+export function AnswerForm({ topicId, question }: { topicId: string; question: Question }) {
   const queryClient = useQueryClient();
   const questionId = question.id;
-  const serverOption = question.draft?.option ?? '';
-  const serverText = question.draft?.text ?? '';
+  const serverOption = question.draft?.option ?? "";
+  const serverText = question.draft?.text ?? "";
 
   const [option, setOption] = useState(serverOption);
   const [text, setText] = useState(serverText);
@@ -97,13 +90,12 @@ export function AnswerForm({
   }, []);
 
   const { mutate: mutateDraft } = useMutation({
-    mutationFn: (draft: Draft | null) =>
-      saveDraftFn({ data: { topicId, questionId, draft } }),
+    mutationFn: (draft: Draft | null) => saveDraftFn({ data: { topicId, questionId, draft } }),
     onMutate: () => {
       inFlightRef.current += 1;
     },
     onSuccess: () => flashSaved(),
-    onError: () => toast('Could not save the draft.'),
+    onError: () => toast("Could not save the draft."),
     onSettled: async () => {
       await invalidateTopicQueries(queryClient, topicId);
       inFlightRef.current -= 1;
@@ -134,7 +126,7 @@ export function AnswerForm({
   );
 
   function pickOption(value: string) {
-    const next = option === value ? '' : value;
+    const next = option === value ? "" : value;
     setOption(next);
     cancelQueuedSave();
     save(next, text);
@@ -154,13 +146,13 @@ export function AnswerForm({
   const recordAnswer = useMutation({
     mutationFn: (value: string) =>
       answerQuestionFn({
-        data: { topicId, questionId, answer: value, answeredVia: 'board' },
+        data: { topicId, questionId, answer: value, answeredVia: "board" },
       }),
     onSuccess: async () => {
       await invalidateTopicQueries(queryClient, topicId);
-      toast('Answer recorded.');
+      toast("Answer recorded.");
     },
-    onError: () => toast('Could not record the answer.'),
+    onError: () => toast("Could not record the answer."),
   });
 
   function record() {
@@ -195,8 +187,8 @@ export function AnswerForm({
                 {recommended && (
                   <span
                     className={cn(
-                      'ml-1.5 text-[10px] font-semibold tracking-[0.08em] uppercase',
-                      active ? 'text-white/75' : 'text-accent-700',
+                      "ml-1.5 text-[10px] font-semibold tracking-[0.08em] uppercase",
+                      active ? "text-white/75" : "text-accent-700",
                     )}
                   >
                     rec
@@ -233,12 +225,7 @@ export function AnswerForm({
 
       {/* Reserved slot: the flash fades in and out without moving the card. */}
       <div className="mt-2 flex h-4 items-center justify-end">
-        <span
-          className={cn(
-            'fade text-xs text-stone-400',
-            flashing ? 'opacity-100' : 'opacity-0',
-          )}
-        >
+        <span className={cn("fade text-xs text-stone-400", flashing ? "opacity-100" : "opacity-0")}>
           saved
         </span>
       </div>
@@ -246,7 +233,7 @@ export function AnswerForm({
       <div className="mt-4 flex justify-end">
         <Button
           type="button"
-          isDisabled={answer === '' || recordAnswer.isPending}
+          isDisabled={answer === "" || recordAnswer.isPending}
           onPress={() => record()}
           className={PRIMARY_BUTTON}
         >

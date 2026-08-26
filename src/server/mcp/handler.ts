@@ -17,14 +17,14 @@ import {
   createMcpHandler,
   localhostAllowedOrigins,
   originValidationResponse,
-} from '@modelcontextprotocol/server';
-import { registerGrillTools } from './tools';
+} from "@modelcontextprotocol/server";
+import { registerGrillTools } from "./tools";
 
 function buildServer(): McpServer {
   const server = new McpServer(
-    { name: 'grill-board', version: '1.0.0' },
+    { name: "grill-board", version: "1.0.0" },
     // The tool list never changes at runtime, so let clients hold it briefly.
-    { cacheHints: { 'tools/list': { ttlMs: 30_000, cacheScope: 'private' } } },
+    { cacheHints: { "tools/list": { ttlMs: 30_000, cacheScope: "private" } } },
   );
   registerGrillTools(server);
   return server;
@@ -34,9 +34,9 @@ const handler = createMcpHandler(() => buildServer(), {
   // Serve 2025-era clients over the same stateless transport instead of
   // rejecting them. Still no session ids, still not the deprecated HTTP+SSE
   // transport.
-  legacy: 'stateless',
+  legacy: "stateless",
   onerror: (error) => {
-    console.error('[mcp]', error);
+    console.error("[mcp]", error);
   },
 });
 
@@ -54,18 +54,15 @@ export function handleMcpRequest(request: Request): Promise<Response> {
   // Guard: POST must carry the Accept header that Streamable HTTP clients send.
   // Real MCP clients always include both application/json and text/event-stream;
   // raw curl/fetch rarely does. Catch misuse early with an actionable message.
-  if (request.method === 'POST') {
-    const accept = request.headers.get('accept') ?? '';
-    if (
-      !accept.includes('application/json') ||
-      !accept.includes('text/event-stream')
-    ) {
+  if (request.method === "POST") {
+    const accept = request.headers.get("accept") ?? "";
+    if (!accept.includes("application/json") || !accept.includes("text/event-stream")) {
       return Promise.resolve(
         Response.json(
           {
             error:
-              'Use a registered MCP client for this endpoint, not raw HTTP. ' +
-              'Register with: claude mcp add --transport http grill-board http://localhost:3000/mcp',
+              "Use a registered MCP client for this endpoint, not raw HTTP. " +
+              "Register with: claude mcp add --transport http grill-board http://localhost:3000/mcp",
           },
           { status: 400 },
         ),

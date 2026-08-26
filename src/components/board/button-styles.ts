@@ -10,12 +10,12 @@
 
 /** Primary action: a black pill. The accent colour is reserved for state. */
 export const PRIMARY_BUTTON =
-  'fade h-auto cursor-pointer rounded-full bg-stone-900 px-5 py-2 text-sm font-medium text-white hover:bg-stone-800 hover:text-white';
+  "fade h-auto cursor-pointer rounded-full bg-stone-900 px-5 py-2 text-sm font-medium text-white hover:bg-stone-800 hover:text-white";
 
 /** Secondary action: the idle pill style, same geometry, quiet colours. */
 export const SECONDARY_BUTTON =
-  'fade h-auto cursor-pointer rounded-full border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-stone-600 hover:border-stone-300 hover:bg-stone-50 hover:text-stone-700';
+  "fade h-auto cursor-pointer rounded-full border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-stone-600 hover:border-stone-300 hover:bg-stone-50 hover:text-stone-700";
 
 /** A destructive action that has been armed and waits for the second click. */
 export const ARMED_BUTTON =
-  'border-red-300 bg-red-50 text-red-700 hover:border-red-300 hover:bg-red-100 hover:text-red-700';
+  "border-red-300 bg-red-50 text-red-700 hover:border-red-300 hover:bg-red-100 hover:text-red-700";

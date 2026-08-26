@@ -8,11 +8,8 @@
  * only opens the file.
  */
 
-import {
-  createStartHandler,
-  defaultStreamHandler,
-} from '@tanstack/react-start/server';
-import { seedIfEmpty } from '@/server/db';
+import { createStartHandler, defaultStreamHandler } from "@tanstack/react-start/server";
+import { seedIfEmpty } from "@/server/db";
 
 seedIfEmpty();
 

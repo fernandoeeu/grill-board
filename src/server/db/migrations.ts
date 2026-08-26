@@ -1,4 +1,4 @@
-import type { Database } from 'better-sqlite3';
+import type { Database } from "better-sqlite3";
 
 /**
  * Schema migrations.
@@ -97,13 +97,13 @@ export function migrate(db: Database): void {
   `);
 
   const row = db
-    .prepare<[], { version: number }>('SELECT version FROM schema_version WHERE id = 1')
+    .prepare<[], { version: number }>("SELECT version FROM schema_version WHERE id = 1")
     .get();
   const current = row?.version ?? 0;
 
   const setVersion = db.prepare<[number]>(
-    'INSERT INTO schema_version (id, version) VALUES (1, ?) ' +
-      'ON CONFLICT(id) DO UPDATE SET version = excluded.version',
+    "INSERT INTO schema_version (id, version) VALUES (1, ?) " +
+      "ON CONFLICT(id) DO UPDATE SET version = excluded.version",
   );
 
   const apply = db.transaction((migration: Migration) => {

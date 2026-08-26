@@ -1,11 +1,11 @@
-import { copyFileSync, existsSync, mkdirSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
-import Database from 'better-sqlite3';
-import { databaseFile } from './connection';
-import { LATEST_VERSION } from './migrations';
+import { copyFileSync, existsSync, mkdirSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import Database from "better-sqlite3";
+import { databaseFile } from "./connection";
+import { LATEST_VERSION } from "./migrations";
 
 /** Legacy DB path used before the XDG migration. */
-const LEGACY_DB_PATH = 'data/grill-board.db';
+const LEGACY_DB_PATH = "data/grill-board.db";
 
 /**
  * Copy a legacy `data/grill-board.db` (relative to cwd) to the global XDG
@@ -45,14 +45,14 @@ export function guardDowngrade(): void {
     if (!tableExists || tableExists.cnt === 0) return;
 
     const row = db
-      .prepare<[], { version: number }>('SELECT version FROM schema_version WHERE id = 1')
+      .prepare<[], { version: number }>("SELECT version FROM schema_version WHERE id = 1")
       .get();
     const dbVersion = row?.version ?? 0;
 
     if (dbVersion > LATEST_VERSION) {
       console.error(
         `Your database was created by a newer version of grill-board (schema ${dbVersion}, code ${LATEST_VERSION}). ` +
-          'Please upgrade: npx grill-board@latest',
+          "Please upgrade: npx grill-board@latest",
       );
       process.exit(1);
     }

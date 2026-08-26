@@ -7,7 +7,7 @@
 
 /** A topic, round or question id does not exist. */
 export class NotFoundError extends Error {
-  override readonly name = 'NotFoundError';
+  override readonly name = "NotFoundError";
 
   constructor(message: string) {
     super(message);
@@ -25,13 +25,9 @@ export function topicNotFound(topicId: string): NotFoundError {
 }
 
 export function roundNotFound(topicId: string, roundId: string): NotFoundError {
-  return new NotFoundError(
-    `no round with id '${roundId}' in topic '${topicId}'; call get_topic`,
-  );
+  return new NotFoundError(`no round with id '${roundId}' in topic '${topicId}'; call get_topic`);
 }
 
 export function questionNotFound(topicId: string, questionId: string): NotFoundError {
-  return new NotFoundError(
-    `no question '${questionId}' in topic '${topicId}'; call get_topic`,
-  );
+  return new NotFoundError(`no question '${questionId}' in topic '${topicId}'; call get_topic`);
 }

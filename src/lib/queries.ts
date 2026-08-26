@@ -5,15 +5,14 @@
  * through MCP shows up on an open board without a manual refresh.
  */
 
-import { queryOptions } from '@tanstack/react-query';
-import type { QueryClient } from '@tanstack/react-query';
+import { queryOptions, type QueryClient } from "@tanstack/react-query";
 
-import { getTopicFn, listTopicsFn } from '@/server/functions/grill';
+import { getTopicFn, listTopicsFn } from "@/server/functions/grill";
 
 /** Every topic for the sidebar. */
 export const topicsQueryOptions = () =>
   queryOptions({
-    queryKey: ['topics'] as const,
+    queryKey: ["topics"] as const,
     queryFn: () => listTopicsFn(),
     refetchInterval: 2500,
   });
@@ -21,7 +20,7 @@ export const topicsQueryOptions = () =>
 /** Full state of one topic. Resolves to `null` when the id is unknown. */
 export const topicQueryOptions = (topicId: string) =>
   queryOptions({
-    queryKey: ['topic', topicId] as const,
+    queryKey: ["topic", topicId] as const,
     queryFn: () => getTopicFn({ data: { topicId } }),
     refetchInterval: 2000,
   });
@@ -32,8 +31,8 @@ export const topicQueryOptions = (topicId: string) =>
  */
 export const invalidateTopicQueries = (queryClient: QueryClient, topicId?: string) =>
   Promise.all([
-    queryClient.invalidateQueries({ queryKey: ['topics'] }),
+    queryClient.invalidateQueries({ queryKey: ["topics"] }),
     ...(topicId === undefined
       ? []
-      : [queryClient.invalidateQueries({ queryKey: ['topic', topicId] })]),
+      : [queryClient.invalidateQueries({ queryKey: ["topic", topicId] })]),
   ]);

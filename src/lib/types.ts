@@ -6,12 +6,12 @@
  * dependency-free so every layer can use it.
  */
 
-export type TopicStatus = 'active' | 'archived';
+export type TopicStatus = "active" | "archived";
 
-export type QuestionStatus = 'open' | 'answered' | 'suspended' | 'pending_facts';
+export type QuestionStatus = "open" | "answered" | "suspended" | "pending_facts";
 
 /** Where an answer came from: recorded by an agent in chat, or typed on the board. */
-export type AnsweredVia = 'chat' | 'board';
+export type AnsweredVia = "chat" | "board";
 
 /** Auto-saved, unsubmitted answer: a picked quick option and/or free text. */
 export interface Draft {
@@ -24,7 +24,7 @@ export interface Draft {
  * consolidated understanding (`synthesis`) plus a single gate question; the
  * last confirmation answered "confirmed" concludes the grill.
  */
-export type RoundKind = 'grill' | 'confirmation';
+export type RoundKind = "grill" | "confirmation";
 
 export interface Round {
   id: string;

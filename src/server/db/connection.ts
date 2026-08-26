@@ -1,15 +1,14 @@
-import { mkdirSync } from 'node:fs';
-import { homedir } from 'node:os';
-import { dirname, join, resolve } from 'node:path';
-import Database from 'better-sqlite3';
-import type { Database as SqliteDatabase } from 'better-sqlite3';
-import { migrate } from './migrations';
+import { mkdirSync } from "node:fs";
+import { homedir } from "node:os";
+import { dirname, join, resolve } from "node:path";
+import Database, { type Database as SqliteDatabase } from "better-sqlite3";
+import { migrate } from "./migrations";
 
 /** XDG-compliant default: $XDG_DATA_HOME/grill-board/grill-board.db */
 const DEFAULT_DB_PATH = join(
-  process.env.XDG_DATA_HOME?.trim() || join(homedir(), '.local', 'share'),
-  'grill-board',
-  'grill-board.db',
+  process.env.XDG_DATA_HOME?.trim() || join(homedir(), ".local", "share"),
+  "grill-board",
+  "grill-board.db",
 );
 
 declare global {
@@ -44,14 +43,14 @@ function open(): SqliteDatabase {
   mkdirSync(dirname(file), { recursive: true });
 
   const database = new Database(file);
-  database.pragma('journal_mode = WAL'); // many readers, one writer
-  database.pragma('foreign_keys = ON'); // per connection, so set it on every open
-  database.pragma('busy_timeout = 5000'); // `pnpm seed` can run beside `pnpm dev`
-  database.pragma('synchronous = NORMAL'); // safe under WAL, much faster commits
+  database.pragma("journal_mode = WAL"); // many readers, one writer
+  database.pragma("foreign_keys = ON"); // per connection, so set it on every open
+  database.pragma("busy_timeout = 5000"); // `pnpm seed` can run beside `pnpm dev`
+  database.pragma("synchronous = NORMAL"); // safe under WAL, much faster commits
   return database;
 }
 
 export function databaseFile(): string {
   const override = process.env.GRILL_BOARD_DB?.trim();
-  return resolve(override !== undefined && override !== '' ? override : DEFAULT_DB_PATH);
+  return resolve(override !== undefined && override !== "" ? override : DEFAULT_DB_PATH);
 }

@@ -14,14 +14,19 @@ import type {
   TopicDetail,
   TopicStatus,
   TopicSummary,
-} from '@/lib/types';
-import { getDb } from './connection';
-import { topicNotFound } from './errors';
-import type { QuestionRow, RoundRow, TopicRow } from './mappers';
-import { mapQuestionRow, mapRoundRow } from './mappers';
-import { computeProgress } from './progress';
+} from "@/lib/types";
+import { getDb } from "./connection";
+import { topicNotFound } from "./errors";
+import {
+  mapQuestionRow,
+  mapRoundRow,
+  type QuestionRow,
+  type RoundRow,
+  type TopicRow,
+} from "./mappers";
+import { computeProgress } from "./progress";
 
-const TOPIC_COLUMNS = 'id, title, context, categories, status, created_at, updated_at';
+const TOPIC_COLUMNS = "id, title, context, categories, status, created_at, updated_at";
 
 /** Bind object for a topic INSERT: every column key must be present. */
 interface TopicInsert {
@@ -117,7 +122,7 @@ export function getTopic(topicId: string): TopicDetail | null {
   if (!row) return null;
 
   const rounds = db
-    .prepare<[string], RoundRow>('SELECT * FROM rounds WHERE topic_id = ? ORDER BY number')
+    .prepare<[string], RoundRow>("SELECT * FROM rounds WHERE topic_id = ? ORDER BY number")
     .all(topicId)
     .map((roundRow) => mapRoundRow(roundRow));
 
@@ -193,22 +198,22 @@ export function updateTopic(
   const values: Record<string, string | number | null> = { id: topicId, updated_at: Date.now() };
 
   if (patch.title !== undefined) {
-    assignments.push('title = @title');
+    assignments.push("title = @title");
     values.title = patch.title;
   }
   if (patch.context !== undefined) {
-    assignments.push('context = @context');
+    assignments.push("context = @context");
     values.context = patch.context;
   }
   if (patch.categories !== undefined) {
-    assignments.push('categories = @categories');
+    assignments.push("categories = @categories");
     values.categories = JSON.stringify(patch.categories);
   }
 
   if (assignments.length > 0) {
     getDb()
       .prepare<Record<string, string | number | null>>(
-        `UPDATE topics SET ${assignments.join(', ')}, updated_at = @updated_at WHERE id = @id`,
+        `UPDATE topics SET ${assignments.join(", ")}, updated_at = @updated_at WHERE id = @id`,
       )
       .run(values);
   }
@@ -220,16 +225,16 @@ export function updateTopic(
 export function setTopicArchived(topicId: string, archived: boolean): TopicDetail {
   getDb()
     .prepare<{ id: string; status: TopicStatus; updated_at: number }>(
-      'UPDATE topics SET status = @status, updated_at = @updated_at WHERE id = @id',
+      "UPDATE topics SET status = @status, updated_at = @updated_at WHERE id = @id",
     )
-    .run({ id: topicId, status: archived ? 'archived' : 'active', updated_at: Date.now() });
+    .run({ id: topicId, status: archived ? "archived" : "active", updated_at: Date.now() });
 
   return requireTopic(topicId);
 }
 
 /** Open the next round on a topic. The number is `max(number) + 1`, starting at 1. */
 export function createRound(topicId: string, extras: NewRound = {}): Round {
-  const { title, kind = 'grill', synthesis } = extras;
+  const { title, kind = "grill", synthesis } = extras;
   const db = getDb();
   const now = Date.now();
 
@@ -240,7 +245,7 @@ export function createRound(topicId: string, extras: NewRound = {}): Round {
 
     const next = db
       .prepare<[string], { number: number }>(
-        'SELECT COALESCE(MAX(number), 0) + 1 AS number FROM rounds WHERE topic_id = ?',
+        "SELECT COALESCE(MAX(number), 0) + 1 AS number FROM rounds WHERE topic_id = ?",
       )
       .get(topicId);
     const number = next ? next.number : 1;
@@ -260,9 +265,9 @@ export function createRound(topicId: string, extras: NewRound = {}): Round {
        VALUES (@id, @topic_id, @number, @title, @kind, @synthesis, @created_at)`,
     ).run(values);
 
-    db.prepare<[number, string]>('UPDATE topics SET updated_at = ? WHERE id = ?').run(now, topicId);
+    db.prepare<[number, string]>("UPDATE topics SET updated_at = ? WHERE id = ?").run(now, topicId);
 
-    const row = db.prepare<[string], RoundRow>('SELECT * FROM rounds WHERE id = ?').get(id);
+    const row = db.prepare<[string], RoundRow>("SELECT * FROM rounds WHERE id = ?").get(id);
     if (!row) throw new Error(`round '${id}' vanished right after being created`);
     return row;
   });
@@ -280,7 +285,7 @@ function requireTopic(topicId: string): TopicDetail {
 
 function topicExists(topicId: string): boolean {
   return (
-    getDb().prepare<[string], { id: string }>('SELECT id FROM topics WHERE id = ?').get(topicId) !==
+    getDb().prepare<[string], { id: string }>("SELECT id FROM topics WHERE id = ?").get(topicId) !==
     undefined
   );
 }
@@ -298,7 +303,7 @@ function toSummary(
     status: toTopicStatus(row.status),
     progress,
     roundCount,
-    openCount: questions.filter((question) => question.status === 'open').length,
+    openCount: questions.filter((question) => question.status === "open").length,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -309,30 +314,30 @@ function toSummary(
 
 /** SQL NULL (and the empty string) mean "absent" — the domain type omits the key. */
 function optionalText(value: string | null | undefined): string | undefined {
-  return value === null || value === undefined || value === '' ? undefined : value;
+  return value === null || value === undefined || value === "" ? undefined : value;
 }
 
 /** The `status` CHECK constraint keeps this total; anything else reads as active. */
 function toTopicStatus(value: string): TopicStatus {
-  return value === 'archived' ? 'archived' : 'active';
+  return value === "archived" ? "archived" : "active";
 }
 
 function parseCategories(raw: string): string[] {
   const parsed: unknown = JSON.parse(raw);
   if (!Array.isArray(parsed)) return [];
-  return parsed.filter((entry): entry is string => typeof entry === 'string');
+  return parsed.filter((entry): entry is string => typeof entry === "string");
 }
 
 /** `Ambientes efêmeros!` → `ambientes-efemeros`. */
 function slugify(title: string): string {
   const slug = title
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/[^a-z0-9]+/g, "-")
     .slice(0, 60)
-    .replace(/^-+|-+$/g, '');
-  return slug === '' ? 'topic' : slug;
+    .replace(/^-+|-+$/g, "");
+  return slug === "" ? "topic" : slug;
 }
 
 function uniqueSlug(title: string): string {

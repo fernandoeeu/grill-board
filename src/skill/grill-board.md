@@ -24,20 +24,20 @@ UI to answer at their own pace; you drive the questions through MCP tools.
 
 ## Available tools
 
-| Tool | Purpose |
-|---|---|
-| `list_topics` | List all grill topics with progress |
-| `get_topic` | Full state of one topic |
-| `create_topic` | Start a new grill |
-| `update_topic` | Edit topic title, context, or categories |
-| `archive_topic` | Archive or un-archive a topic |
-| `create_round` | Open a new round of questions |
-| `add_questions` | Batch-add questions to a round |
-| `update_question` | Edit question content |
-| `set_question_status` | Move a question between statuses |
-| `answer_question` | Record an answer |
-| `list_pending_questions` | Questions still waiting on the human |
-| `export_answers` | Export all recorded answers |
+| Tool                     | Purpose                                  |
+| ------------------------ | ---------------------------------------- |
+| `list_topics`            | List all grill topics with progress      |
+| `get_topic`              | Full state of one topic                  |
+| `create_topic`           | Start a new grill                        |
+| `update_topic`           | Edit topic title, context, or categories |
+| `archive_topic`          | Archive or un-archive a topic            |
+| `create_round`           | Open a new round of questions            |
+| `add_questions`          | Batch-add questions to a round           |
+| `update_question`        | Edit question content                    |
+| `set_question_status`    | Move a question between statuses         |
+| `answer_question`        | Record an answer                         |
+| `list_pending_questions` | Questions still waiting on the human     |
+| `export_answers`         | Export all recorded answers              |
 
 ## Tips
 

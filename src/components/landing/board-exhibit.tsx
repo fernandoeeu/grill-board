@@ -1,7 +1,7 @@
-import { T } from '@/components/landing/lang'
-import { Stamp, Tape } from '@/components/landing/zine'
+import { T } from "@/components/landing/lang";
+import { Stamp, Tape } from "@/components/landing/zine";
 
-import type { CSSProperties, ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from "react";
 
 /**
  * The board, re-created in the page's own ink — no screenshots, no bitmaps.
@@ -11,7 +11,7 @@ export function BoardExhibit() {
   return (
     <div
       className="cutout relative mx-auto w-full max-w-2xl p-5 text-ink sm:p-7"
-      style={{ '--cut-r': '-1.2deg', '--cut-r2': '-0.6deg' } as CSSProperties}
+      style={{ "--cut-r": "-1.2deg", "--cut-r2": "-0.6deg" } as CSSProperties}
     >
       <Tape className="-top-3 -left-8" r={-38} />
       <Tape className="-top-3 -right-8" r={42} />
@@ -109,16 +109,16 @@ export function BoardExhibit() {
         />
       </p>
     </div>
-  )
+  );
 }
 
 interface ExhibitCardProps {
-  rotate: string
-  category: ReactNode
-  question: ReactNode
-  recommendation: ReactNode
-  stamp: ReactNode
-  children: ReactNode
+  rotate: string;
+  category: ReactNode;
+  question: ReactNode;
+  recommendation: ReactNode;
+  stamp: ReactNode;
+  children: ReactNode;
 }
 
 function ExhibitCard({
@@ -130,10 +130,7 @@ function ExhibitCard({
   children,
 }: ExhibitCardProps) {
   return (
-    <article
-      className="relative mt-5 border-2 border-ink p-4"
-      style={{ rotate }}
-    >
+    <article className="relative mt-5 border-2 border-ink p-4" style={{ rotate }}>
       <div className="absolute -top-3.5 -right-2">{stamp}</div>
       <p className="font-mono text-[10px] font-bold tracking-[0.2em] uppercase opacity-60">
         {category}
@@ -149,5 +146,5 @@ function ExhibitCard({
       </p>
       {children}
     </article>
-  )
+  );
 }

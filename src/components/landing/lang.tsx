@@ -1,26 +1,24 @@
-import { useLayoutEffect } from 'react'
-import { Button } from 'react-aria-components'
+import { useLayoutEffect, type ReactNode } from "react";
+import { Button } from "react-aria-components";
 
-import { cn } from '@/lib/utils'
+import { cn } from "@/lib/utils";
 
-import type { ReactNode } from 'react'
-
-export type LandingLang = 'en' | 'pt'
+export type LandingLang = "en" | "pt";
 
 /** localStorage key. UI preference only, mirroring `grill-board-theme`. */
-export const LANG_STORAGE_KEY = 'grill-board-lang'
+export const LANG_STORAGE_KEY = "grill-board-lang";
 
 /**
  * NO-FLASH SNIPPET — the landing route injects this via `head.scripts` so
  * html[data-lang] is set before first paint. Both languages are in the DOM;
  * CSS in styles.css shows exactly one. Default (no attribute) renders EN.
  */
-export const LANG_SCRIPT = `(function(){try{var l=localStorage.getItem('grill-board-lang');if(l==='pt'||l==='en'){document.documentElement.dataset.lang=l}}catch(e){}})()`
+export const LANG_SCRIPT = `(function(){try{var l=localStorage.getItem('grill-board-lang');if(l==='pt'||l==='en'){document.documentElement.dataset.lang=l}}catch(e){}})()`;
 
 function applyLang(lang: LandingLang) {
-  document.documentElement.dataset.lang = lang
+  document.documentElement.dataset.lang = lang;
   try {
-    localStorage.setItem(LANG_STORAGE_KEY, lang)
+    localStorage.setItem(LANG_STORAGE_KEY, lang);
   } catch {
     // Private mode: the choice still applies for this visit.
   }
@@ -33,20 +31,20 @@ function applyLang(lang: LandingLang) {
 export function useStoredLang() {
   useLayoutEffect(() => {
     try {
-      const stored = localStorage.getItem(LANG_STORAGE_KEY)
-      if (stored === 'pt' || stored === 'en') {
-        document.documentElement.dataset.lang = stored
+      const stored = localStorage.getItem(LANG_STORAGE_KEY);
+      if (stored === "pt" || stored === "en") {
+        document.documentElement.dataset.lang = stored;
       }
     } catch {
       // No storage, no preference: EN stays.
     }
-  }, [])
+  }, []);
 }
 
 interface TProps {
-  en: ReactNode
-  pt: ReactNode
-  className?: string
+  en: ReactNode;
+  pt: ReactNode;
+  className?: string;
 }
 
 /** Renders both languages; CSS picks one via html[data-lang]. */
@@ -60,7 +58,7 @@ export function T({ en, pt, className }: TProps) {
         {pt}
       </span>
     </>
-  )
+  );
 }
 
 /** EN|PT stamp pair. Active state is pure CSS off html[data-lang]. */
@@ -69,22 +67,22 @@ export function LangToggle({ className }: { className?: string }) {
     <div
       role="group"
       aria-label="Language / Idioma"
-      className={cn('flex items-center gap-1.5', className)}
+      className={cn("flex items-center gap-1.5", className)}
     >
       <Button
         className="lang-btn lang-btn-en press text-sm"
-        style={{ rotate: '-2deg' }}
-        onPress={() => applyLang('en')}
+        style={{ rotate: "-2deg" }}
+        onPress={() => applyLang("en")}
       >
         EN
       </Button>
       <Button
         className="lang-btn lang-btn-pt press text-sm"
-        style={{ rotate: '1.5deg' }}
-        onPress={() => applyLang('pt')}
+        style={{ rotate: "1.5deg" }}
+        onPress={() => applyLang("pt")}
       >
         PT
       </Button>
     </div>
-  )
+  );
 }

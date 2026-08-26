@@ -1,47 +1,44 @@
-import { useEffect, useRef, useState } from 'react'
-import { createFileRoute } from '@tanstack/react-router'
-import { Button } from 'react-aria-components'
+import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import { Button } from "react-aria-components";
 
-import { BoardExhibit } from '@/components/landing/board-exhibit'
-import { LANG_SCRIPT, LangToggle, T, useStoredLang } from '@/components/landing/lang'
-import { Ink, Stamp, Tape, Words } from '@/components/landing/zine'
+import { BoardExhibit } from "@/components/landing/board-exhibit";
+import { LANG_SCRIPT, LangToggle, T, useStoredLang } from "@/components/landing/lang";
+import { Ink, Stamp, Tape, Words } from "@/components/landing/zine";
 
-import { cn } from '@/lib/utils'
+import { cn } from "@/lib/utils";
 
-import type { CSSProperties } from 'react'
+const MCP_COMMAND = "claude mcp add --transport http grill-board http://localhost:3000/mcp";
 
-const MCP_COMMAND =
-  'claude mcp add --transport http grill-board http://localhost:3000/mcp'
-
-export const Route = createFileRoute('/landing')({
+export const Route = createFileRoute("/landing")({
   head: () => ({
     meta: [
-      { title: 'Grill Board — Ideas go in. Specs come out.' },
+      { title: "Grill Board — Ideas go in. Specs come out." },
       {
-        name: 'description',
+        name: "description",
         content:
-          'A local board where your agent interrogates you, round after round, until an idea becomes a spec.',
+          "A local board where your agent interrogates you, round after round, until an idea becomes a spec.",
       },
     ],
     links: [
-      { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
       {
-        rel: 'preconnect',
-        href: 'https://fonts.gstatic.com',
-        crossOrigin: 'anonymous',
+        rel: "preconnect",
+        href: "https://fonts.gstatic.com",
+        crossOrigin: "anonymous",
       },
       {
-        rel: 'stylesheet',
-        href: 'https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap',
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap",
       },
     ],
     scripts: [{ children: LANG_SCRIPT }],
   }),
   component: LandingPage,
-})
+});
 
 function LandingPage() {
-  useStoredLang()
+  useStoredLang();
 
   return (
     <div className="landing min-h-svh overflow-x-clip font-mono">
@@ -53,7 +50,7 @@ function LandingPage() {
       <Doctrine />
       <Verdict />
     </div>
-  )
+  );
 }
 
 /* ------------------------------------------------------------------------ */
@@ -64,19 +61,14 @@ function Hero() {
   return (
     <section className="relative flex min-h-svh flex-col px-5 sm:px-10">
       <header className="flex items-center justify-between pt-5">
-        <span className="font-display text-lg tracking-wide uppercase">
-          Grill Board
-        </span>
+        <span className="font-display text-lg tracking-wide uppercase">Grill Board</span>
         <LangToggle />
       </header>
 
       <Ink className="mx-auto flex w-full max-w-5xl flex-1 flex-col justify-center py-16">
         <p>
           <Stamp blood r={-3} className="text-sm sm:text-base">
-            <T
-              en="Interrogation room nº 3000"
-              pt="Sala de interrogatório nº 3000"
-            />
+            <T en="Interrogation room nº 3000" pt="Sala de interrogatório nº 3000" />
           </Stamp>
         </p>
 
@@ -86,14 +78,14 @@ function Hero() {
             en={
               <>
                 <span className="block">
-                  <Words text="Ideas go" step={80} />{' '}
+                  <Words text="Ideas go" step={80} />{" "}
                   <span className="wmask">
-                    <span className="w" style={{ '--w-d': '160ms' } as CSSProperties}>
+                    <span className="w" style={{ "--w-d": "160ms" } as CSSProperties}>
                       in<span className="text-blood">.</span>
                     </span>
                   </span>
                 </span>
-                <span className="mt-3 block" style={{ rotate: '-1deg' }}>
+                <span className="mt-3 block" style={{ rotate: "-1deg" }}>
                   <Words
                     text="Specs come out."
                     from={260}
@@ -106,14 +98,14 @@ function Hero() {
             pt={
               <>
                 <span className="block">
-                  <Words text="A ideia" step={80} />{' '}
+                  <Words text="A ideia" step={80} />{" "}
                   <span className="wmask">
-                    <span className="w" style={{ '--w-d': '160ms' } as CSSProperties}>
+                    <span className="w" style={{ "--w-d": "160ms" } as CSSProperties}>
                       entra<span className="text-blood">.</span>
                     </span>
                   </span>
                 </span>
-                <span className="mt-3 block" style={{ rotate: '-1deg' }}>
+                <span className="mt-3 block" style={{ rotate: "-1deg" }}>
                   <Words
                     text="O spec sai."
                     from={260}
@@ -130,14 +122,14 @@ function Hero() {
           <T
             en={
               <>
-                Your agent interrogates you until{' '}
-                <span className="mark-blood">nothing</span> is left assumed.
+                Your agent interrogates you until <span className="mark-blood">nothing</span> is
+                left assumed.
               </>
             }
             pt={
               <>
-                Seu agente te interroga até não sobrar{' '}
-                <span className="mark-blood">nada</span> assumido.
+                Seu agente te interroga até não sobrar <span className="mark-blood">nada</span>{" "}
+                assumido.
               </>
             }
           />
@@ -151,14 +143,12 @@ function Hero() {
           </p>
           <div aria-hidden className="hidden text-right sm:block">
             <div className="barcode w-36 opacity-80" />
-            <p className="mt-1 text-[10px] tracking-[0.3em] uppercase opacity-60">
-              grl·brd·3000
-            </p>
+            <p className="mt-1 text-[10px] tracking-[0.3em] uppercase opacity-60">grl·brd·3000</p>
           </div>
         </div>
       </Ink>
     </section>
-  )
+  );
 }
 
 /* ------------------------------------------------------------------------ */
@@ -167,50 +157,50 @@ function Hero() {
 
 const STEPS = [
   {
-    n: '01',
+    n: "01",
     en: {
-      title: 'You bring an idea.',
+      title: "You bring an idea.",
       body: "Half-formed is fine. The grill exists because it's half-formed.",
     },
     pt: {
-      title: 'Você traz uma ideia.',
-      body: 'Pode vir pela metade. O grill existe porque ela está pela metade.',
+      title: "Você traz uma ideia.",
+      body: "Pode vir pela metade. O grill existe porque ela está pela metade.",
     },
   },
   {
-    n: '02',
+    n: "02",
     en: {
-      title: 'The agent opens a topic.',
-      body: 'It digs through code and docs first — then fires a round of questions it cannot answer alone.',
+      title: "The agent opens a topic.",
+      body: "It digs through code and docs first — then fires a round of questions it cannot answer alone.",
     },
     pt: {
-      title: 'O agente abre um topic.',
-      body: 'Primeiro ele vasculha código e docs — depois dispara um round de perguntas que não consegue responder sozinho.',
+      title: "O agente abre um topic.",
+      body: "Primeiro ele vasculha código e docs — depois dispara um round de perguntas que não consegue responder sozinho.",
     },
   },
   {
-    n: '03',
+    n: "03",
     en: {
-      title: 'You answer on the board.',
-      body: 'At your own pace. Every answer settles prerequisites and unlocks the next round of questions: the frontier.',
+      title: "You answer on the board.",
+      body: "At your own pace. Every answer settles prerequisites and unlocks the next round of questions: the frontier.",
     },
     pt: {
-      title: 'Você responde no board.',
-      body: 'No seu ritmo. Cada resposta assenta pré-requisitos e destrava o próximo round de perguntas: a frontier.',
+      title: "Você responde no board.",
+      body: "No seu ritmo. Cada resposta assenta pré-requisitos e destrava o próximo round de perguntas: a frontier.",
     },
   },
   {
-    n: '04',
+    n: "04",
     en: {
-      title: 'The frontier runs dry.',
-      body: 'No question left to ask, nothing left silently assumed. Out comes a spec — and the tickets to build it.',
+      title: "The frontier runs dry.",
+      body: "No question left to ask, nothing left silently assumed. Out comes a spec — and the tickets to build it.",
     },
     pt: {
-      title: 'A frontier seca.',
-      body: 'Nenhuma pergunta restante, nada assumido em silêncio. Sai um spec — e os tickets para construí-lo.',
+      title: "A frontier seca.",
+      body: "Nenhuma pergunta restante, nada assumido em silêncio. Sai um spec — e os tickets para construí-lo.",
     },
   },
-]
+];
 
 function Interrogation() {
   return (
@@ -223,15 +213,9 @@ function Interrogation() {
 
         <ol className="mt-12 grid gap-x-10 gap-y-12 sm:grid-cols-2">
           {STEPS.map((step, i) => (
-            <li
-              key={step.n}
-              className="rise"
-              style={{ '--ink-d': `${i * 70}ms` } as CSSProperties}
-            >
+            <li key={step.n} className="rise" style={{ "--ink-d": `${i * 70}ms` } as CSSProperties}>
               <div className="flex items-baseline gap-4">
-                <span className="font-display text-5xl text-blood sm:text-6xl">
-                  {step.n}
-                </span>
+                <span className="font-display text-5xl text-blood sm:text-6xl">{step.n}</span>
                 <h3 className="text-lg font-bold uppercase sm:text-xl">
                   <T en={step.en.title} pt={step.pt.title} />
                 </h3>
@@ -245,23 +229,21 @@ function Interrogation() {
 
         <div
           className="cutout relative mx-auto mt-16 max-w-xl p-5"
-          style={{ '--cut-r': '1deg', '--cut-r2': '1.6deg' } as CSSProperties}
+          style={{ "--cut-r": "1deg", "--cut-r2": "1.6deg" } as CSSProperties}
         >
           <Tape className="-top-3 left-10" r={-42} />
           <p className="text-sm leading-relaxed">
             <T
               en={
                 <>
-                  <strong className="text-blood">FRONTIER, n.</strong> — the
-                  questions whose prerequisites are already settled. The grill
-                  is done when the frontier is empty.
+                  <strong className="text-blood">FRONTIER, n.</strong> — the questions whose
+                  prerequisites are already settled. The grill is done when the frontier is empty.
                 </>
               }
               pt={
                 <>
-                  <strong className="text-blood">FRONTIER, s.</strong> — as
-                  perguntas cujos pré-requisitos já estão assentados. O grill
-                  acaba quando a frontier esvazia.
+                  <strong className="text-blood">FRONTIER, s.</strong> — as perguntas cujos
+                  pré-requisitos já estão assentados. O grill acaba quando a frontier esvazia.
                 </>
               }
             />
@@ -269,7 +251,7 @@ function Interrogation() {
         </div>
       </Ink>
     </section>
-  )
+  );
 }
 
 /* ------------------------------------------------------------------------ */
@@ -301,7 +283,7 @@ function Evidence() {
         </div>
       </Ink>
     </section>
-  )
+  );
 }
 
 /* ------------------------------------------------------------------------ */
@@ -317,7 +299,7 @@ function Doctrine() {
             <T
               en={
                 <>
-                  Facts are the agent&rsquo;s job.{' '}
+                  Facts are the agent&rsquo;s job.{" "}
                   <span className="bg-ink px-[0.14em] text-bone">
                     Decisions are yours<span className="text-blood">.</span>
                   </span>
@@ -325,7 +307,7 @@ function Doctrine() {
               }
               pt={
                 <>
-                  Fatos são trabalho do agente.{' '}
+                  Fatos são trabalho do agente.{" "}
                   <span className="bg-ink px-[0.14em] text-bone">
                     Decisões são suas<span className="text-blood">.</span>
                   </span>
@@ -336,7 +318,10 @@ function Doctrine() {
         </div>
 
         <div className="mt-12 grid max-w-4xl gap-10 sm:grid-cols-2">
-          <p className="rise text-sm leading-relaxed" style={{ '--ink-d': '80ms' } as CSSProperties}>
+          <p
+            className="rise text-sm leading-relaxed"
+            style={{ "--ink-d": "80ms" } as CSSProperties}
+          >
             <T
               en="It reads the code. It searches the docs. It never asks what it can look up — only what only you can decide: trade-offs, taste, risk."
               pt="Ele lê o código. Ele busca nos docs. Nunca pergunta o que pode descobrir — só o que só você pode decidir: trade-offs, gosto, risco."
@@ -346,9 +331,9 @@ function Doctrine() {
             className="cutout rise relative p-5"
             style={
               {
-                '--ink-d': '160ms',
-                '--cut-r': '-1deg',
-                '--cut-r2': '-0.4deg',
+                "--ink-d": "160ms",
+                "--cut-r": "-1deg",
+                "--cut-r2": "-0.4deg",
               } as CSSProperties
             }
           >
@@ -357,16 +342,15 @@ function Doctrine() {
               <T
                 en={
                   <>
-                    A grill doesn&rsquo;t judge a plan. It interrogates an{' '}
-                    <span className="text-blood">idea</span> until it becomes
-                    shared understanding.
+                    A grill doesn&rsquo;t judge a plan. It interrogates an{" "}
+                    <span className="text-blood">idea</span> until it becomes shared understanding.
                   </>
                 }
                 pt={
                   <>
-                    Um grill não julga um plano. Ele interroga uma{' '}
-                    <span className="text-blood">ideia</span> até ela virar
-                    entendimento compartilhado.
+                    Um grill não julga um plano. Ele interroga uma{" "}
+                    <span className="text-blood">ideia</span> até ela virar entendimento
+                    compartilhado.
                   </>
                 }
               />
@@ -375,7 +359,7 @@ function Doctrine() {
         </div>
       </Ink>
     </section>
-  )
+  );
 }
 
 /* ------------------------------------------------------------------------ */
@@ -411,7 +395,7 @@ function Verdict() {
         </footer>
       </Ink>
     </section>
-  )
+  );
 }
 
 /* ------------------------------------------------------------------------ */
@@ -419,16 +403,16 @@ function Verdict() {
 /* ------------------------------------------------------------------------ */
 
 function CommandBlock({
-  flavor = 'ink',
+  flavor = "ink",
   className,
 }: {
-  flavor?: 'ink' | 'bone'
-  className?: string
+  flavor?: "ink" | "bone";
+  className?: string;
 }) {
-  const onInk = flavor === 'bone'
+  const onInk = flavor === "bone";
 
   return (
-    <div className={cn('max-w-3xl', className)}>
+    <div className={cn("max-w-3xl", className)}>
       <p>
         <Stamp blood={!onInk} r={-2} d={80} className="text-xs sm:text-sm">
           <T en="Wire your agent — the only CTA" pt="Plugue seu agente — o único CTA" />
@@ -436,12 +420,10 @@ function CommandBlock({
       </p>
       <div
         className={cn(
-          'relative mt-3 flex flex-wrap items-center gap-4 p-5 sm:p-6',
-          onInk
-            ? 'cutout text-ink'
-            : 'bg-ink text-bone shadow-[6px_6px_0_0_var(--color-blood)]',
+          "relative mt-3 flex flex-wrap items-center gap-4 p-5 sm:p-6",
+          onInk ? "cutout text-ink" : "bg-ink text-bone shadow-[6px_6px_0_0_var(--color-blood)]",
         )}
-        style={onInk ? ({ '--cut-r': '-0.6deg', '--cut-r2': '0deg' } as CSSProperties) : undefined}
+        style={onInk ? ({ "--cut-r": "-0.6deg", "--cut-r2": "0deg" } as CSSProperties) : undefined}
       >
         <Tape className="-top-3 right-12" r={34} />
         <code className="min-w-0 flex-1 text-sm leading-relaxed font-bold break-all sm:text-base">
@@ -453,52 +435,43 @@ function CommandBlock({
         <CopyButton onInk={onInk} />
       </div>
       <p className="mt-2 text-[11px] font-bold tracking-[0.18em] uppercase opacity-60">
-        <T
-          en="One command. Your agent does the rest."
-          pt="Um comando. Seu agente faz o resto."
-        />
+        <T en="One command. Your agent does the rest." pt="Um comando. Seu agente faz o resto." />
       </p>
     </div>
-  )
+  );
 }
 
 function CopyButton({ onInk }: { onInk: boolean }) {
-  const [copied, setCopied] = useState(false)
-  const timer = useRef<number | null>(null)
+  const [copied, setCopied] = useState(false);
+  const timer = useRef<number | null>(null);
 
   useEffect(() => {
     return () => {
-      if (timer.current !== null) window.clearTimeout(timer.current)
-    }
-  }, [])
+      if (timer.current !== null) window.clearTimeout(timer.current);
+    };
+  }, []);
 
   return (
     <Button
       className={cn(
-        'press shrink-0 cursor-pointer border-2 px-3 py-2 text-xs font-bold tracking-[0.14em] uppercase',
-        onInk
-          ? 'border-ink text-ink'
-          : 'border-bone text-bone',
-        copied && 'border-blood text-blood',
+        "press shrink-0 cursor-pointer border-2 px-3 py-2 text-xs font-bold tracking-[0.14em] uppercase",
+        onInk ? "border-ink text-ink" : "border-bone text-bone",
+        copied && "border-blood text-blood",
       )}
       onPress={() => {
         navigator.clipboard
           .writeText(MCP_COMMAND)
           .then(() => {
-            setCopied(true)
-            if (timer.current !== null) window.clearTimeout(timer.current)
-            timer.current = window.setTimeout(() => setCopied(false), 1800)
+            setCopied(true);
+            if (timer.current !== null) window.clearTimeout(timer.current);
+            timer.current = window.setTimeout(() => setCopied(false), 1800);
           })
           .catch(() => {
             // Clipboard blocked: the command is right there to select.
-          })
+          });
       }}
     >
-      {copied ? (
-        <T en="Copied!" pt="Copiado!" />
-      ) : (
-        <T en="Copy" pt="Copiar" />
-      )}
+      {copied ? <T en="Copied!" pt="Copiado!" /> : <T en="Copy" pt="Copiar" />}
     </Button>
-  )
+  );
 }

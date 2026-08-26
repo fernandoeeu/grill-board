@@ -7,23 +7,23 @@
  *   grill-board        — (future) start the server
  */
 
-import { init } from './init.js';
+import { init } from "./init.js";
 
 const subcommand = process.argv[2];
 
 switch (subcommand) {
-  case 'init':
+  case "init":
     init();
     break;
 
   case undefined:
-    console.log('Usage: grill-board <command>\n');
-    console.log('Commands:');
-    console.log('  init    Register MCP server and install skill in detected agent clients');
+    console.log("Usage: grill-board <command>\n");
+    console.log("Commands:");
+    console.log("  init    Register MCP server and install skill in detected agent clients");
     break;
 
   default:
     console.error(`Unknown command: ${subcommand}`);
-    console.error('Run `grill-board` without arguments to see available commands.');
+    console.error("Run `grill-board` without arguments to see available commands.");
     process.exit(1);
 }

@@ -1,11 +1,11 @@
 {
   "name": "grill-board",
   "license": "FSL-1.1-MIT",
-  "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/fernandoeeu/grill-board"
   },
+  "type": "module",
   "scripts": {
     "dev": "vite dev --port 3000",
     "build": "vite build",

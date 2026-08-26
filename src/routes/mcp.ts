@@ -6,10 +6,10 @@
  * POST and refuses GET and DELETE with 405 (this revision has no SSE stream).
  */
 
-import { createFileRoute } from '@tanstack/react-router';
-import { handleMcpRequest } from '@/server/mcp/handler';
+import { createFileRoute } from "@tanstack/react-router";
+import { handleMcpRequest } from "@/server/mcp/handler";
 
-export const Route = createFileRoute('/mcp')({
+export const Route = createFileRoute("/mcp")({
   server: {
     handlers: {
       POST: ({ request }) => handleMcpRequest(request),

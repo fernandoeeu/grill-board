@@ -5,7 +5,7 @@
  * code ONLY from here. SQL lives behind this barrel and nowhere else.
  */
 
-export { NotFoundError } from './errors';
+export { NotFoundError } from "./errors";
 
 export {
   listTopics,
@@ -14,7 +14,7 @@ export {
   updateTopic,
   setTopicArchived,
   createRound,
-} from './dal-topics';
+} from "./dal-topics";
 
 export {
   addQuestions,
@@ -23,8 +23,8 @@ export {
   answerQuestion,
   saveDraft,
   clearDrafts,
-} from './dal-questions';
+} from "./dal-questions";
 
-export { listPendingQuestions, exportAnswers } from './dal-export';
+export { listPendingQuestions, exportAnswers } from "./dal-export";
 
-export { seedIfEmpty } from './seed';
+export { seedIfEmpty } from "./seed";

@@ -8,10 +8,10 @@
  * Idempotent: running twice produces the same result with no duplicates.
  */
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { homedir } from 'node:os';
-import { fileURLToPath } from 'node:url';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { homedir } from "node:os";
+import { fileURLToPath } from "node:url";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -43,12 +43,12 @@ interface InitResult {
 // ---------------------------------------------------------------------------
 
 const MCP_SERVER_ENTRY = {
-  command: 'npx',
-  args: ['grill-board'],
+  command: "npx",
+  args: ["grill-board"],
 } as const;
 
-const MCP_SERVER_NAME = 'grill-board';
-const SKILL_FILENAME = 'grill-board.md';
+const MCP_SERVER_NAME = "grill-board";
+const SKILL_FILENAME = "grill-board.md";
 
 // ---------------------------------------------------------------------------
 // Bundled skill resolution
@@ -58,7 +58,7 @@ function bundledSkillPath(): string {
   const thisDir = dirname(fileURLToPath(import.meta.url));
   // In source: src/bin/init.ts -> src/skill/grill-board.md
   // At runtime the relative path is the same regardless of transpilation.
-  return join(thisDir, '..', 'skill', SKILL_FILENAME);
+  return join(thisDir, "..", "skill", SKILL_FILENAME);
 }
 
 // ---------------------------------------------------------------------------
@@ -68,11 +68,11 @@ function bundledSkillPath(): string {
 function buildClients(home: string): AgentClient[] {
   return [
     {
-      name: 'Claude Code',
-      detectDir: join(home, '.claude'),
-      mcpConfigPath: join(home, '.claude.json'),
-      mcpConfigKey: 'mcpServers',
-      skillDir: join(home, '.claude', 'skills'),
+      name: "Claude Code",
+      detectDir: join(home, ".claude"),
+      mcpConfigPath: join(home, ".claude.json"),
+      mcpConfigKey: "mcpServers",
+      skillDir: join(home, ".claude", "skills"),
     },
     // opencode and Codex stubs — detection directories TBD; they will never
     // match until the directories are known, which keeps the exit-code
@@ -86,15 +86,15 @@ function buildClients(home: string): AgentClient[] {
 
 function readJsonFile(path: string): Record<string, unknown> {
   if (!existsSync(path)) return {};
-  const raw = readFileSync(path, 'utf-8').trim();
-  if (raw === '') return {};
+  const raw = readFileSync(path, "utf-8").trim();
+  if (raw === "") return {};
   return JSON.parse(raw) as Record<string, unknown>;
 }
 
 function writeJsonFile(path: string, data: Record<string, unknown>): void {
   const dir = dirname(path);
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
-  writeFileSync(path, JSON.stringify(data, null, 2) + '\n', 'utf-8');
+  writeFileSync(path, JSON.stringify(data, null, 2) + "\n", "utf-8");
 }
 
 // ---------------------------------------------------------------------------
@@ -127,8 +127,8 @@ function installSkill(client: AgentClient): { installed: boolean; alreadyPresent
   }
 
   const src = bundledSkillPath();
-  const content = readFileSync(src, 'utf-8');
-  writeFileSync(dest, content, 'utf-8');
+  const content = readFileSync(src, "utf-8");
+  writeFileSync(dest, content, "utf-8");
   return { installed: true, alreadyPresent: false };
 }
 
@@ -147,11 +147,9 @@ export function init(options: InitOptions = {}): void {
   const detected: AgentClient[] = clients.filter((c) => existsSync(c.detectDir));
 
   if (detected.length === 0) {
-    console.log('No agent clients detected.');
-    console.log(
-      'Looked for: ' + clients.map((c) => `${c.name} (${c.detectDir})`).join(', ') + '.',
-    );
-    console.log('Install an agent client and run `grill-board init` again.');
+    console.log("No agent clients detected.");
+    console.log("Looked for: " + clients.map((c) => `${c.name} (${c.detectDir})`).join(", ") + ".");
+    console.log("Install an agent client and run `grill-board init` again.");
     return;
   }
 
@@ -170,18 +168,18 @@ export function init(options: InitOptions = {}): void {
   }
 
   // Summary
-  console.log('grill-board init complete.\n');
+  console.log("grill-board init complete.\n");
   for (const r of results) {
     console.log(`  ${r.client}:`);
     if (r.mcpRegistered) {
-      console.log('    MCP server registered.');
+      console.log("    MCP server registered.");
     } else if (r.mcpAlreadyPresent) {
-      console.log('    MCP server already registered (skipped).');
+      console.log("    MCP server already registered (skipped).");
     }
     if (r.skillInstalled) {
-      console.log('    Skill installed.');
+      console.log("    Skill installed.");
     } else if (r.skillAlreadyPresent) {
-      console.log('    Skill already installed (skipped).');
+      console.log("    Skill already installed (skipped).");
     }
   }
 }

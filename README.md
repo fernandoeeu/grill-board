@@ -86,20 +86,20 @@ Delete the file and the next boot rebuilds it.
 
 ## MCP tools
 
-| Tool | Purpose |
-|---|---|
-| `list_topics` | Every topic with status, counts and progress. |
-| `get_topic` | Full topic state: rounds, questions, progress. |
-| `create_topic` | New topic from title, context and categories. |
-| `update_topic` | Edit title, context or categories. |
-| `archive_topic` | Archive or un-archive a topic. |
-| `create_round` | Open a new round on a topic. |
-| `add_questions` | Batch-add questions to a round. |
-| `update_question` | Edit question text, recommendation, options, category or note. |
-| `set_question_status` | Move to `open` / `answered` / `suspended` / `pending_facts`. |
-| `answer_question` | Record an answer; flips status to `answered`. |
-| `list_pending_questions` | Everything still `open`, for one topic or all. |
-| `export_answers` | A topic's answers as Markdown or JSON. |
+| Tool                     | Purpose                                                        |
+| ------------------------ | -------------------------------------------------------------- |
+| `list_topics`            | Every topic with status, counts and progress.                  |
+| `get_topic`              | Full topic state: rounds, questions, progress.                 |
+| `create_topic`           | New topic from title, context and categories.                  |
+| `update_topic`           | Edit title, context or categories.                             |
+| `archive_topic`          | Archive or un-archive a topic.                                 |
+| `create_round`           | Open a new round on a topic.                                   |
+| `add_questions`          | Batch-add questions to a round.                                |
+| `update_question`        | Edit question text, recommendation, options, category or note. |
+| `set_question_status`    | Move to `open` / `answered` / `suspended` / `pending_facts`.   |
+| `answer_question`        | Record an answer; flips status to `answered`.                  |
+| `list_pending_questions` | Everything still `open`, for one topic or all.                 |
+| `export_answers`         | A topic's answers as Markdown or JSON.                         |
 
 ## License
 

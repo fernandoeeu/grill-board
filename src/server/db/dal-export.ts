@@ -5,11 +5,10 @@
  * no redundant nesting, stable ordering.
  */
 
-import type { AnsweredVia, PendingQuestion } from '@/lib/types';
-import { getDb } from './connection';
-import { topicNotFound } from './errors';
-import { mapQuestionRow } from './mappers';
-import type { QuestionRow } from './mappers';
+import type { AnsweredVia, PendingQuestion } from "@/lib/types";
+import { getDb } from "./connection";
+import { topicNotFound } from "./errors";
+import { mapQuestionRow, type QuestionRow } from "./mappers";
 
 /** A question row carried with the title of its topic. */
 interface PendingRow extends QuestionRow {
@@ -49,7 +48,7 @@ const ANSWERED_SQL = `
 /** Read a topic title, or throw the agent-helpful not-found error. */
 function requireTopicTitle(topicId: string): string {
   const row = getDb()
-    .prepare<[string], { title: string }>('SELECT title FROM topics WHERE id = ?')
+    .prepare<[string], { title: string }>("SELECT title FROM topics WHERE id = ?")
     .get(topicId);
   if (!row) {
     throw topicNotFound(topicId);
@@ -88,17 +87,17 @@ export function listPendingQuestions(opts?: {
  * Only `answered` questions carrying a non-empty answer are exported;
  * drafts are not answers.
  */
-export function exportAnswers(topicId: string, format: 'markdown' | 'json' = 'markdown'): string {
+export function exportAnswers(topicId: string, format: "markdown" | "json" = "markdown"): string {
   const title = requireTopicTitle(topicId);
   const rows = getDb().prepare<[string], QuestionRow>(ANSWERED_SQL).all(topicId);
   const questions = rows.map(mapQuestionRow);
 
-  if (format === 'json') {
+  if (format === "json") {
     const answers: ExportedAnswer[] = questions.map((q) => ({
       id: q.id,
       round: q.roundNumber,
       category: q.category,
-      answer: q.answer ?? '',
+      answer: q.answer ?? "",
       ...(q.answeredVia ? { answeredVia: q.answeredVia } : {}),
     }));
     return JSON.stringify({ topicId, title, answers });
@@ -106,6 +105,6 @@ export function exportAnswers(topicId: string, format: 'markdown' | 'json' = 'ma
 
   const heading = `## Answers — ${title}`;
   if (questions.length === 0) return heading;
-  const lines = questions.map((q) => `- **${q.id}** (round ${q.roundNumber}): ${q.answer ?? ''}`);
-  return [heading, '', ...lines].join('\n');
+  const lines = questions.map((q) => `- **${q.id}** (round ${q.roundNumber}): ${q.answer ?? ""}`);
+  return [heading, "", ...lines].join("\n");
 }

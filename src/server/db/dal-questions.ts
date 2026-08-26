@@ -12,20 +12,13 @@
  *   so domain objects never carry nulls.
  */
 
-import type { Database as SqliteDatabase } from 'better-sqlite3';
+import type { Database as SqliteDatabase } from "better-sqlite3";
 
-import type {
-  AnsweredVia,
-  Draft,
-  NewQuestion,
-  Question,
-  QuestionStatus,
-} from '@/lib/types';
+import type { AnsweredVia, Draft, NewQuestion, Question, QuestionStatus } from "@/lib/types";
 
-import { getDb } from './connection';
-import { questionNotFound, roundNotFound, topicNotFound } from './errors';
-import { mapQuestionRow } from './mappers';
-import type { QuestionRow } from './mappers';
+import { getDb } from "./connection";
+import { questionNotFound, roundNotFound, topicNotFound } from "./errors";
+import { mapQuestionRow, type QuestionRow } from "./mappers";
 
 /** Shared shape of every question read: the row plus its round number. */
 const QUESTION_SELECT = `
@@ -53,7 +46,7 @@ interface QuestionInsert {
 
 function requireTopic(db: SqliteDatabase, topicId: string): void {
   const row = db
-    .prepare<[string], { id: string }>('SELECT id FROM topics WHERE id = ?')
+    .prepare<[string], { id: string }>("SELECT id FROM topics WHERE id = ?")
     .get(topicId);
   if (!row) {
     throw topicNotFound(topicId);
@@ -61,15 +54,9 @@ function requireTopic(db: SqliteDatabase, topicId: string): void {
 }
 
 /** Reads one question, or throws with a message an agent can act on. */
-function readQuestion(
-  db: SqliteDatabase,
-  topicId: string,
-  questionId: string,
-): Question {
+function readQuestion(db: SqliteDatabase, topicId: string, questionId: string): Question {
   const row = db
-    .prepare<[string, string], QuestionRow>(
-      `${QUESTION_SELECT} WHERE q.topic_id = ? AND q.id = ?`,
-    )
+    .prepare<[string, string], QuestionRow>(`${QUESTION_SELECT} WHERE q.topic_id = ? AND q.id = ?`)
     .get(topicId, questionId);
   if (!row) {
     requireTopic(db, topicId);
@@ -79,10 +66,7 @@ function readQuestion(
 }
 
 function touchTopic(db: SqliteDatabase, topicId: string, now: number): void {
-  db.prepare<[number, string]>('UPDATE topics SET updated_at = ? WHERE id = ?').run(
-    now,
-    topicId,
-  );
+  db.prepare<[number, string]>("UPDATE topics SET updated_at = ? WHERE id = ?").run(now, topicId);
 }
 
 /** Empty and whitespace-only text is stored as NULL, never as ''. */
@@ -129,17 +113,13 @@ function draftOrNull(draft: Draft | null | undefined): string | null {
  * A question without an explicit id gets the next unused `q<n>` of the topic.
  * Returns the created questions in input order.
  */
-export function addQuestions(
-  topicId: string,
-  roundId: string,
-  items: NewQuestion[],
-): Question[] {
+export function addQuestions(topicId: string, roundId: string, items: NewQuestion[]): Question[] {
   const db = getDb();
   requireTopic(db, topicId);
 
   const round = db
     .prepare<[string, string], { id: string }>(
-      'SELECT id FROM rounds WHERE id = ? AND topic_id = ?',
+      "SELECT id FROM rounds WHERE id = ? AND topic_id = ?",
     )
     .get(roundId, topicId);
   if (!round) {
@@ -160,15 +140,13 @@ export function addQuestions(
   const run = db.transaction((): Question[] => {
     const taken = new Set(
       db
-        .prepare<[string], { id: string }>(
-          'SELECT id FROM questions WHERE topic_id = ?',
-        )
+        .prepare<[string], { id: string }>("SELECT id FROM questions WHERE topic_id = ?")
         .all(topicId)
         .map((row) => row.id),
     );
     const last = db
       .prepare<[string], { max_position: number | null }>(
-        'SELECT MAX(position) AS max_position FROM questions WHERE topic_id = ?',
+        "SELECT MAX(position) AS max_position FROM questions WHERE topic_id = ?",
       )
       .get(topicId);
 
@@ -198,7 +176,7 @@ export function addQuestions(
         topic_id: topicId,
         round_id: roundId,
         category: item.category,
-        status: item.status ?? 'open',
+        status: item.status ?? "open",
         text: item.text,
         recommendation: textOrNull(item.recommendation),
         recommended_option: recommendedOption,
@@ -213,16 +191,14 @@ export function addQuestions(
 
     touchTopic(db, topicId, now);
 
-    const placeholders = ids.map(() => '?').join(', ');
+    const placeholders = ids.map(() => "?").join(", ");
     const rows = db
       .prepare<string[], QuestionRow>(
         `${QUESTION_SELECT} WHERE q.topic_id = ? AND q.id IN (${placeholders})`,
       )
       .all(topicId, ...ids);
     const order = new Map(ids.map((id, index) => [id, index]));
-    return rows
-      .map(mapQuestionRow)
-      .sort((a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0));
+    return rows.map(mapQuestionRow).sort((a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0));
   });
 
   return run();
@@ -252,23 +228,23 @@ export function updateQuestion(
     const params: Array<string | number | null> = [];
 
     if (patch.text !== undefined) {
-      assignments.push('text = ?');
+      assignments.push("text = ?");
       params.push(patch.text);
     }
     if (patch.category !== undefined) {
-      assignments.push('category = ?');
+      assignments.push("category = ?");
       params.push(patch.category);
     }
     if (patch.recommendation !== undefined) {
-      assignments.push('recommendation = ?');
+      assignments.push("recommendation = ?");
       params.push(textOrNull(patch.recommendation));
     }
     if (patch.options !== undefined) {
-      assignments.push('options = ?');
+      assignments.push("options = ?");
       params.push(optionsOrNull(patch.options));
     }
     if (patch.note !== undefined) {
-      assignments.push('note = ?');
+      assignments.push("note = ?");
       params.push(textOrNull(patch.note));
     }
 
@@ -280,14 +256,14 @@ export function updateQuestion(
     if (patch.recommendedOption !== undefined) {
       const next = textOrNull(patch.recommendedOption);
       checkRecommendedOption(next, effectiveOptions, questionId);
-      assignments.push('recommended_option = ?');
+      assignments.push("recommended_option = ?");
       params.push(next);
     } else if (
       patch.options !== undefined &&
       current.recommendedOption !== undefined &&
       !(effectiveOptions ?? []).includes(current.recommendedOption)
     ) {
-      assignments.push('recommended_option = ?');
+      assignments.push("recommended_option = ?");
       params.push(null);
     }
 
@@ -295,11 +271,11 @@ export function updateQuestion(
     if (assignments.length === 0) return current;
 
     const now = Date.now();
-    assignments.push('updated_at = ?');
+    assignments.push("updated_at = ?");
     params.push(now);
 
     db.prepare<Array<string | number | null>>(
-      `UPDATE questions SET ${assignments.join(', ')}
+      `UPDATE questions SET ${assignments.join(", ")}
         WHERE topic_id = ? AND id = ?`,
     ).run(...params, topicId, questionId);
     touchTopic(db, topicId, now);
@@ -383,11 +359,7 @@ export function answerQuestion(
  * Saves the auto-saved draft answer. `null` — or a draft with no option and no
  * text — clears it, which keeps the progress count honest.
  */
-export function saveDraft(
-  topicId: string,
-  questionId: string,
-  draft: Draft | null,
-): Question {
+export function saveDraft(topicId: string, questionId: string, draft: Draft | null): Question {
   const db = getDb();
   const now = Date.now();
 

@@ -6,16 +6,13 @@
  * and never slides under the sidebar.
  */
 
-import { Progress } from '@/components/ui/progress'
-import {
-  AddQuestionsDialog,
-  AddRoundDialog,
-} from '@/components/board/manage-dialogs'
+import { Progress } from "@/components/ui/progress";
+import { AddQuestionsDialog, AddRoundDialog } from "@/components/board/manage-dialogs";
 
-import type { TopicDetail } from '@/lib/types'
+import type { TopicDetail } from "@/lib/types";
 
 export function TopicHeader({ topic }: { topic: TopicDetail }) {
-  const { done, total, percent } = topic.progress
+  const { done, total, percent } = topic.progress;
 
   return (
     <header className="sticky top-10 z-30 border-b border-stone-100 bg-background/85 backdrop-blur">
@@ -24,7 +21,7 @@ export function TopicHeader({ topic }: { topic: TopicDetail }) {
           <span className="text-[11px] font-semibold tracking-[0.16em] text-stone-400 uppercase">
             Grill
           </span>
-          {topic.status === 'archived' && (
+          {topic.status === "archived" && (
             <span className="text-[11px] font-semibold tracking-[0.16em] text-stone-400 uppercase">
               archived
             </span>
@@ -36,17 +33,11 @@ export function TopicHeader({ topic }: { topic: TopicDetail }) {
         </h1>
 
         {topic.context && (
-          <p className="mt-2 text-sm leading-relaxed text-stone-500">
-            {topic.context}
-          </p>
+          <p className="mt-2 text-sm leading-relaxed text-stone-500">{topic.context}</p>
         )}
 
         <div className="mt-5 flex flex-wrap items-center gap-4">
-          <Progress
-            value={percent}
-            aria-label="Questions answered"
-            className="w-40"
-          />
+          <Progress value={percent} aria-label="Questions answered" className="w-40" />
           <span className="text-sm text-stone-500">
             {done} of {total} questions answered
           </span>
@@ -58,5 +49,5 @@ export function TopicHeader({ topic }: { topic: TopicDetail }) {
         </div>
       </div>
     </header>
-  )
+  );
 }
