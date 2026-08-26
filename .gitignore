@@ -23,3 +23,6 @@ dist-ssr
 *.local
 __unconfig*
 todos.json
+
+# Agent worktrees
+.claude/worktrees/
