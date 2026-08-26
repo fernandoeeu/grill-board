@@ -50,5 +50,28 @@ export function handleMcpRequest(request: Request): Promise<Response> {
   if (rejected !== undefined) {
     return Promise.resolve(rejected);
   }
+
+  // Guard: POST must carry the Accept header that Streamable HTTP clients send.
+  // Real MCP clients always include both application/json and text/event-stream;
+  // raw curl/fetch rarely does. Catch misuse early with an actionable message.
+  if (request.method === 'POST') {
+    const accept = request.headers.get('accept') ?? '';
+    if (
+      !accept.includes('application/json') ||
+      !accept.includes('text/event-stream')
+    ) {
+      return Promise.resolve(
+        Response.json(
+          {
+            error:
+              'Use a registered MCP client for this endpoint, not raw HTTP. ' +
+              'Register with: claude mcp add --transport http grill-board http://localhost:3000/mcp',
+          },
+          { status: 400 },
+        ),
+      );
+    }
+  }
+
   return handler.fetch(request);
 }
