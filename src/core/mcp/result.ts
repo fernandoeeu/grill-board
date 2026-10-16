@@ -8,7 +8,7 @@
  * a stack trace.
  */
 
-import { NotFoundError } from "@/server/db";
+import { NotFoundError } from "../errors.js";
 
 /**
  * The single text block a tool answers with.

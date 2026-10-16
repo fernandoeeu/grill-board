@@ -1,4 +1,4 @@
-import type { Database } from "better-sqlite3";
+import { toDb, type SqliteDatabase } from "./sqlite.js";
 
 /**
  * Schema migrations.
@@ -87,8 +87,13 @@ const MIGRATIONS: ReadonlyArray<Migration> = [
 /** The highest migration version the running code knows about. */
 export const LATEST_VERSION: number = MIGRATIONS[MIGRATIONS.length - 1]!.version;
 
-/** Bring the database up to the latest schema version. Safe to call on every open. */
-export function migrate(db: Database): void {
+/**
+ * Bring the database up to the latest schema version. Idempotent: a database
+ * already at the latest version is left untouched. Throws on a database written
+ * by a newer grill-board, instead of running old code against a newer schema.
+ */
+export function migrate(connection: SqliteDatabase): void {
+  const db = toDb(connection);
   db.exec(`
     CREATE TABLE IF NOT EXISTS schema_version (
       id      INTEGER PRIMARY KEY CHECK (id = 1),
@@ -100,18 +105,38 @@ export function migrate(db: Database): void {
     .prepare<[], { version: number }>("SELECT version FROM schema_version WHERE id = 1")
     .get();
   const current = row?.version ?? 0;
+  if (current > LATEST_VERSION) {
+    throw new Error(
+      `the database is at grill-board schema ${current}, this code knows ${LATEST_VERSION}; ` +
+        "upgrade grill-board",
+    );
+  }
 
   const setVersion = db.prepare<[number]>(
     "INSERT INTO schema_version (id, version) VALUES (1, ?) " +
       "ON CONFLICT(id) DO UPDATE SET version = excluded.version",
   );
 
-  const apply = db.transaction((migration: Migration) => {
-    db.exec(migration.sql);
-    setVersion.run(migration.version);
-  });
-
   for (const migration of MIGRATIONS) {
-    if (migration.version > current) apply(migration);
+    if (migration.version <= current) continue;
+    db.transaction(() => {
+      db.exec(migration.sql);
+      setVersion.run(migration.version);
+    })();
   }
+}
+
+/** The schema version recorded in the database, or 0 when it has none yet. */
+export function schemaVersion(connection: SqliteDatabase): number {
+  const db = toDb(connection);
+  const table = db
+    .prepare<[], { name: string }>(
+      "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'schema_version'",
+    )
+    .get();
+  if (table === undefined) return 0;
+  return (
+    db.prepare<[], { version: number }>("SELECT version FROM schema_version WHERE id = 1").get()
+      ?.version ?? 0
+  );
 }

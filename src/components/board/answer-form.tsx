@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { invalidateTopicQueries } from "@/lib/queries";
-import type { Draft, Question } from "@/lib/types";
+import type { Draft, Question } from "@/core/types";
 import { cn } from "@/lib/utils";
 import { answerQuestionFn, saveDraftFn } from "@/server/functions/grill";
 

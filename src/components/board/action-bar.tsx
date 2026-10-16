@@ -17,7 +17,7 @@ import { draftAsText } from "@/components/board/answer-form";
 import { ARMED_BUTTON, PRIMARY_BUTTON, SECONDARY_BUTTON } from "@/components/board/button-styles";
 import { Button } from "@/components/ui/button";
 import { invalidateTopicQueries } from "@/lib/queries";
-import type { TopicDetail } from "@/lib/types";
+import type { TopicDetail } from "@/core/types";
 import { cn } from "@/lib/utils";
 import { clearDraftsFn } from "@/server/functions/grill";
 

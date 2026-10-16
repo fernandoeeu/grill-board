@@ -2,8 +2,7 @@
  * Data access for topics and rounds.
  *
  * The only place that speaks SQL about the `topics` and `rounds` tables.
- * Every function is synchronous: the driver is better-sqlite3 and the whole
- * app runs in one local Node process.
+ * Every function is synchronous and takes the host connection first.
  */
 
 import type {
@@ -14,8 +13,8 @@ import type {
   TopicDetail,
   TopicStatus,
   TopicSummary,
-} from "@/lib/types";
-import { getDb } from "./connection.js";
+} from "./types.js";
+import type { Db } from "./sqlite.js";
 import { topicNotFound } from "./errors.js";
 import {
   mapQuestionRow,
@@ -63,8 +62,7 @@ export interface NewRound {
  * Two queries, never one per topic: one for the topics, one for every
  * question that belongs to them.
  */
-export function listTopics(status?: TopicStatus): TopicSummary[] {
-  const db = getDb();
+export function listTopics(db: Db, status?: TopicStatus): TopicSummary[] {
   const filter = status ?? null;
 
   const topicRows = db
@@ -113,9 +111,7 @@ export function listTopics(status?: TopicStatus): TopicSummary[] {
 }
 
 /** Full state of one topic, or `null` when there is no such topic. Three queries. */
-export function getTopic(topicId: string): TopicDetail | null {
-  const db = getDb();
-
+export function getTopic(db: Db, topicId: string): TopicDetail | null {
   const row = db
     .prepare<[string], TopicRow>(`SELECT ${TOPIC_COLUMNS} FROM topics WHERE id = ?`)
     .get(topicId);
@@ -158,20 +154,21 @@ export function getTopic(topicId: string): TopicDetail | null {
  * de-duplicated (`my-topic`, `my-topic-2`, …); an explicit id that is already
  * taken is an error.
  */
-export function createTopic(input: {
-  id?: string;
-  title: string;
-  context?: string;
-  categories: string[];
-}): TopicDetail {
-  const db = getDb();
-
-  if (input.id !== undefined && topicExists(input.id)) {
+export function createTopic(
+  db: Db,
+  input: {
+    id?: string;
+    title: string;
+    context?: string;
+    categories: string[];
+  },
+): TopicDetail {
+  if (input.id !== undefined && topicExists(db, input.id)) {
     throw new Error(`topic id '${input.id}' already exists; call get_topic or pick another id`);
   }
 
   const now = Date.now();
-  const id = input.id ?? uniqueSlug(input.title);
+  const id = input.id ?? uniqueSlug(db, input.title);
   const values: TopicInsert = {
     id,
     title: input.title,
@@ -186,11 +183,12 @@ export function createTopic(input: {
      VALUES (@id, @title, @context, @categories, 'active', @created_at, @updated_at)`,
   ).run(values);
 
-  return requireTopic(id);
+  return requireTopic(db, id);
 }
 
 /** Edit title / context / categories. Absent keys are left untouched. */
 export function updateTopic(
+  db: Db,
   topicId: string,
   patch: { title?: string; context?: string; categories?: string[] },
 ): TopicDetail {
@@ -211,35 +209,30 @@ export function updateTopic(
   }
 
   if (assignments.length > 0) {
-    getDb()
-      .prepare<Record<string, string | number | null>>(
-        `UPDATE topics SET ${assignments.join(", ")}, updated_at = @updated_at WHERE id = @id`,
-      )
-      .run(values);
+    db.prepare<Record<string, string | number | null>>(
+      `UPDATE topics SET ${assignments.join(", ")}, updated_at = @updated_at WHERE id = @id`,
+    ).run(values);
   }
 
-  return requireTopic(topicId);
+  return requireTopic(db, topicId);
 }
 
 /** Archive or un-archive a topic. */
-export function setTopicArchived(topicId: string, archived: boolean): TopicDetail {
-  getDb()
-    .prepare<{ id: string; status: TopicStatus; updated_at: number }>(
-      "UPDATE topics SET status = @status, updated_at = @updated_at WHERE id = @id",
-    )
-    .run({ id: topicId, status: archived ? "archived" : "active", updated_at: Date.now() });
+export function setTopicArchived(db: Db, topicId: string, archived: boolean): TopicDetail {
+  db.prepare<{ id: string; status: TopicStatus; updated_at: number }>(
+    "UPDATE topics SET status = @status, updated_at = @updated_at WHERE id = @id",
+  ).run({ id: topicId, status: archived ? "archived" : "active", updated_at: Date.now() });
 
-  return requireTopic(topicId);
+  return requireTopic(db, topicId);
 }
 
 /** Open the next round on a topic. The number is `max(number) + 1`, starting at 1. */
-export function createRound(topicId: string, extras: NewRound = {}): Round {
+export function createRound(db: Db, topicId: string, extras: NewRound = {}): Round {
   const { title, kind = "grill", synthesis } = extras;
-  const db = getDb();
   const now = Date.now();
 
   const insert = db.transaction((): RoundRow => {
-    if (!topicExists(topicId)) {
+    if (!topicExists(db, topicId)) {
       throw topicNotFound(topicId);
     }
 
@@ -277,15 +270,15 @@ export function createRound(topicId: string, extras: NewRound = {}): Round {
 
 /* ------------------------------------------------------------------ helpers */
 
-function requireTopic(topicId: string): TopicDetail {
-  const topic = getTopic(topicId);
+function requireTopic(db: Db, topicId: string): TopicDetail {
+  const topic = getTopic(db, topicId);
   if (!topic) throw topicNotFound(topicId);
   return topic;
 }
 
-function topicExists(topicId: string): boolean {
+function topicExists(db: Db, topicId: string): boolean {
   return (
-    getDb().prepare<[string], { id: string }>("SELECT id FROM topics WHERE id = ?").get(topicId) !==
+    db.prepare<[string], { id: string }>("SELECT id FROM topics WHERE id = ?").get(topicId) !==
     undefined
   );
 }
@@ -340,12 +333,12 @@ function slugify(title: string): string {
   return slug === "" ? "topic" : slug;
 }
 
-function uniqueSlug(title: string): string {
+function uniqueSlug(db: Db, title: string): string {
   const base = slugify(title);
-  if (!topicExists(base)) return base;
+  if (!topicExists(db, base)) return base;
   for (let suffix = 2; suffix < 1000; suffix += 1) {
     const candidate = `${base}-${suffix}`;
-    if (!topicExists(candidate)) return candidate;
+    if (!topicExists(db, candidate)) return candidate;
   }
   return `${base}-${Date.now()}`;
 }

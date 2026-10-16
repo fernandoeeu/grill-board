@@ -4,11 +4,12 @@
     "noEmit": false,
     "outDir": "dist",
     "rootDir": "src",
-    "declaration": false,
+    "declaration": true,
     "allowImportingTsExtensions": false,
     "verbatimModuleSyntax": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false
   },
-  "include": ["src/bin/**/*.ts", "src/server/db/**/*.ts", "src/lib/types.ts"]
+  "include": ["src/bin/**/*.ts", "src/server/db/**/*.ts", "src/core/**/*.ts"],
+  "exclude": ["src/**/*.test.ts"]
 }

@@ -9,7 +9,7 @@
  *
  * The handler is built once per process; its factory runs once per HTTP
  * request and builds a fresh `McpServer`. That is cheap and correct: all the
- * state lives in SQLite behind `@/server/db`, keyed by topic id.
+ * state lives in SQLite behind `@/core`, keyed by topic id.
  */
 
 import {
@@ -18,7 +18,8 @@ import {
   localhostAllowedOrigins,
   originValidationResponse,
 } from "@modelcontextprotocol/server";
-import { registerGrillTools } from "./tools";
+import { grillTools } from "@/core";
+import { grill } from "@/server/db";
 
 function buildServer(): McpServer {
   const server = new McpServer(
@@ -26,7 +27,10 @@ function buildServer(): McpServer {
     // The tool list never changes at runtime, so let clients hold it briefly.
     { cacheHints: { "tools/list": { ttlMs: 30_000, cacheScope: "private" } } },
   );
-  registerGrillTools(server);
+  for (const tool of grillTools(grill())) {
+    const { name, title, description, inputSchema, handler } = tool;
+    server.registerTool(name, { title, description, inputSchema }, handler);
+  }
   return server;
 }
 

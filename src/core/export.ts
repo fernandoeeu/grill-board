@@ -5,8 +5,8 @@
  * no redundant nesting, stable ordering.
  */
 
-import type { AnsweredVia, PendingQuestion } from "@/lib/types";
-import { getDb } from "./connection.js";
+import type { AnsweredVia, PendingQuestion } from "./types.js";
+import type { Db } from "./sqlite.js";
 import { topicNotFound } from "./errors.js";
 import { mapQuestionRow, type QuestionRow } from "./mappers.js";
 
@@ -46,8 +46,8 @@ const ANSWERED_SQL = `
 `;
 
 /** Read a topic title, or throw the agent-helpful not-found error. */
-function requireTopicTitle(topicId: string): string {
-  const row = getDb()
+function requireTopicTitle(db: Db, topicId: string): string {
+  const row = db
     .prepare<[string], { title: string }>("SELECT title FROM topics WHERE id = ?")
     .get(topicId);
   if (!row) {
@@ -61,14 +61,17 @@ function requireTopicTitle(topicId: string): string {
  * too when asked. Covers all topics — archived ones included — unless a
  * `topicId` narrows it.
  */
-export function listPendingQuestions(opts?: {
-  topicId?: string;
-  includePendingFacts?: boolean;
-}): PendingQuestion[] {
+export function listPendingQuestions(
+  db: Db,
+  opts?: {
+    topicId?: string;
+    includePendingFacts?: boolean;
+  },
+): PendingQuestion[] {
   const topicId = opts?.topicId;
-  if (topicId !== undefined) requireTopicTitle(topicId);
+  if (topicId !== undefined) requireTopicTitle(db, topicId);
 
-  const rows = getDb()
+  const rows = db
     .prepare<{ includePendingFacts: number; topicId: string | null }, PendingRow>(PENDING_SQL)
     .all({
       includePendingFacts: opts?.includePendingFacts ? 1 : 0,
@@ -87,9 +90,13 @@ export function listPendingQuestions(opts?: {
  * Only `answered` questions carrying a non-empty answer are exported;
  * drafts are not answers.
  */
-export function exportAnswers(topicId: string, format: "markdown" | "json" = "markdown"): string {
-  const title = requireTopicTitle(topicId);
-  const rows = getDb().prepare<[string], QuestionRow>(ANSWERED_SQL).all(topicId);
+export function exportAnswers(
+  db: Db,
+  topicId: string,
+  format: "markdown" | "json" = "markdown",
+): string {
+  const title = requireTopicTitle(db, topicId);
+  const rows = db.prepare<[string], QuestionRow>(ANSWERED_SQL).all(topicId);
   const questions = rows.map(mapQuestionRow);
 
   if (format === "json") {

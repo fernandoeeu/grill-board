@@ -1,13 +1,12 @@
 /**
  * First-boot seed: imports the prototype topic (spec §5) into SQLite.
  *
- * It writes EXCLUSIVELY through the data-access layer — no SQL here — so the
+ * It writes EXCLUSIVELY through the core — no SQL here — so the
  * seeded rows go through exactly the same code path as an agent creating a
  * topic over MCP. Idempotent: it returns early when the topic already exists.
  */
-import type { NewQuestion, QuestionStatus } from "@/lib/types";
-import { createRound, createTopic, getTopic } from "./dal-topics.js";
-import { addQuestions, answerQuestion } from "./dal-questions.js";
+import type { NewQuestion, QuestionStatus } from "../../core/index.js";
+import { grill } from "./connection.js";
 import { seedTopic, type SeedQuestion } from "./seed-data.js";
 
 /**
@@ -44,6 +43,7 @@ function toNewQuestion(question: SeedQuestion): NewQuestion {
  * Called on server startup and by `pnpm seed`.
  */
 export function seedIfEmpty(): void {
+  const { addQuestions, answerQuestion, createRound, createTopic, getTopic } = grill();
   if (getTopic(seedTopic.id) !== null) return;
 
   createTopic({

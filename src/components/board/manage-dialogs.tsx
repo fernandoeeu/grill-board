@@ -49,7 +49,7 @@ import {
   updateQuestionFn,
 } from "@/server/functions/grill";
 
-import type { NewQuestion, Question, QuestionStatus, TopicDetail } from "@/lib/types";
+import type { NewQuestion, Question, QuestionStatus, TopicDetail } from "@/core/types";
 
 /**
  * Single status -> label + badge map (spec 4.4).

@@ -27,7 +27,7 @@ import { invalidateTopicQueries, topicsQueryOptions } from "@/lib/queries";
 import { cn } from "@/lib/utils";
 import { setTopicArchivedFn } from "@/server/functions/grill";
 
-import type { TopicSummary } from "@/lib/types";
+import type { TopicSummary } from "@/core/types";
 
 const EYEBROW = "text-[11px] font-semibold tracking-[0.16em] uppercase";
 

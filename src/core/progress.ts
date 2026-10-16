@@ -1,4 +1,4 @@
-import type { Draft, Progress, Question } from "@/lib/types";
+import type { Draft, Progress, Question } from "./types.js";
 
 /**
  * The one and only implementation of the progress rule.

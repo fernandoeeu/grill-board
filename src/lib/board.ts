@@ -5,7 +5,7 @@
  * tick and the scroll-spy never marks it.
  */
 
-import type { Question, Round } from "@/lib/types";
+import type { Question, Round } from "@/core/types";
 
 export interface RoundSectionData {
   round: Round;

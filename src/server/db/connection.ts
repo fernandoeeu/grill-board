@@ -2,7 +2,7 @@ import { mkdirSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import Database, { type Database as SqliteDatabase } from "better-sqlite3";
-import { migrate } from "./migrations.js";
+import { createGrillCore, migrate, type GrillCore } from "../../core/index.js";
 
 /** XDG-compliant default: $XDG_DATA_HOME/grill-board/grill-board.db */
 const DEFAULT_DB_PATH = join(
@@ -53,4 +53,9 @@ function open(): SqliteDatabase {
 export function databaseFile(): string {
   const override = process.env.GRILL_BOARD_DB?.trim();
   return resolve(override !== undefined && override !== "" ? override : DEFAULT_DB_PATH);
+}
+
+/** The Grill Board core over the process connection. */
+export function grill(): GrillCore {
+  return createGrillCore(getDb());
 }
