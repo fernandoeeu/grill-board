@@ -4,12 +4,12 @@
  * Safe to run any number of times: the import is skipped when the topic is
  * already there.
  */
-import { getTopic, seedIfEmpty } from "@/server/db";
+import { grill, seedIfEmpty } from "@/server/db";
 import { seedTopic } from "@/server/db/seed-data";
 
 seedIfEmpty();
 
-const topic = getTopic(seedTopic.id);
+const topic = grill().getTopic(seedTopic.id);
 
 if (topic === null) {
   console.error(`seed failed: no topic '${seedTopic.id}' after seeding`);

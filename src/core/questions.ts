@@ -12,11 +12,9 @@
  *   so domain objects never carry nulls.
  */
 
-import type { Database as SqliteDatabase } from "better-sqlite3";
+import type { AnsweredVia, Draft, NewQuestion, Question, QuestionStatus } from "./types.js";
 
-import type { AnsweredVia, Draft, NewQuestion, Question, QuestionStatus } from "@/lib/types";
-
-import { getDb } from "./connection.js";
+import type { Db } from "./sqlite.js";
 import { questionNotFound, roundNotFound, topicNotFound } from "./errors.js";
 import { mapQuestionRow, type QuestionRow } from "./mappers.js";
 
@@ -44,7 +42,7 @@ interface QuestionInsert {
   updated_at: number;
 }
 
-function requireTopic(db: SqliteDatabase, topicId: string): void {
+function requireTopic(db: Db, topicId: string): void {
   const row = db
     .prepare<[string], { id: string }>("SELECT id FROM topics WHERE id = ?")
     .get(topicId);
@@ -54,7 +52,7 @@ function requireTopic(db: SqliteDatabase, topicId: string): void {
 }
 
 /** Reads one question, or throws with a message an agent can act on. */
-function readQuestion(db: SqliteDatabase, topicId: string, questionId: string): Question {
+function readQuestion(db: Db, topicId: string, questionId: string): Question {
   const row = db
     .prepare<[string, string], QuestionRow>(`${QUESTION_SELECT} WHERE q.topic_id = ? AND q.id = ?`)
     .get(topicId, questionId);
@@ -65,7 +63,7 @@ function readQuestion(db: SqliteDatabase, topicId: string, questionId: string): 
   return mapQuestionRow(row);
 }
 
-function touchTopic(db: SqliteDatabase, topicId: string, now: number): void {
+function touchTopic(db: Db, topicId: string, now: number): void {
   db.prepare<[number, string]>("UPDATE topics SET updated_at = ? WHERE id = ?").run(now, topicId);
 }
 
@@ -113,8 +111,12 @@ function draftOrNull(draft: Draft | null | undefined): string | null {
  * A question without an explicit id gets the next unused `q<n>` of the topic.
  * Returns the created questions in input order.
  */
-export function addQuestions(topicId: string, roundId: string, items: NewQuestion[]): Question[] {
-  const db = getDb();
+export function addQuestions(
+  db: Db,
+  topicId: string,
+  roundId: string,
+  items: NewQuestion[],
+): Question[] {
   requireTopic(db, topicId);
 
   const round = db
@@ -209,6 +211,7 @@ export function addQuestions(topicId: string, roundId: string, items: NewQuestio
  * an explicit `null` clears the column, `undefined` leaves it untouched.
  */
 export function updateQuestion(
+  db: Db,
   topicId: string,
   questionId: string,
   patch: {
@@ -220,8 +223,6 @@ export function updateQuestion(
     note?: string | null;
   },
 ): Question {
-  const db = getDb();
-
   const run = db.transaction((): Question => {
     const current = readQuestion(db, topicId, questionId); // throws NotFoundError
     const assignments: string[] = [];
@@ -290,12 +291,12 @@ export function updateQuestion(
  * note; omitting it leaves the note as it was.
  */
 export function setQuestionStatus(
+  db: Db,
   topicId: string,
   questionId: string,
   status: QuestionStatus,
   note?: string,
 ): Question {
-  const db = getDb();
   const now = Date.now();
 
   const run = db.transaction((): Question => {
@@ -328,12 +329,12 @@ export function setQuestionStatus(
  * `answered` and drops the draft. Quick-pick options are kept.
  */
 export function answerQuestion(
+  db: Db,
   topicId: string,
   questionId: string,
   answer: string,
   answeredVia: AnsweredVia,
 ): Question {
-  const db = getDb();
   const now = Date.now();
 
   const run = db.transaction((): Question => {
@@ -359,8 +360,12 @@ export function answerQuestion(
  * Saves the auto-saved draft answer. `null` — or a draft with no option and no
  * text — clears it, which keeps the progress count honest.
  */
-export function saveDraft(topicId: string, questionId: string, draft: Draft | null): Question {
-  const db = getDb();
+export function saveDraft(
+  db: Db,
+  topicId: string,
+  questionId: string,
+  draft: Draft | null,
+): Question {
   const now = Date.now();
 
   const run = db.transaction((): Question => {
@@ -384,8 +389,7 @@ export function saveDraft(topicId: string, questionId: string, draft: Draft | nu
  * Clears every unsubmitted draft of a topic. Only `open` questions that carry
  * a draft are touched. Returns how many were cleared.
  */
-export function clearDrafts(topicId: string): number {
-  const db = getDb();
+export function clearDrafts(db: Db, topicId: string): number {
   requireTopic(db, topicId);
   const now = Date.now();
 

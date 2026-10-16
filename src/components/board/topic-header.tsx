@@ -9,7 +9,7 @@
 import { Progress } from "@/components/ui/progress";
 import { AddQuestionsDialog, AddRoundDialog } from "@/components/board/manage-dialogs";
 
-import type { TopicDetail } from "@/lib/types";
+import type { TopicDetail } from "@/core/types";
 
 export function TopicHeader({ topic }: { topic: TopicDetail }) {
   const { done, total, percent } = topic.progress;

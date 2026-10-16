@@ -1,4 +1,4 @@
-import type { AnsweredVia, QuestionStatus } from "@/lib/types";
+import type { AnsweredVia, QuestionStatus } from "../../core/index.js";
 
 /** A round as declared by the seed: only its number, ids are generated at insert time. */
 export interface SeedRound {

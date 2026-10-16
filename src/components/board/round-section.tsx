@@ -11,7 +11,7 @@ import { QuestionCard } from "@/components/board/question-card";
 import { answeredCount } from "@/lib/board";
 import { cn } from "@/lib/utils";
 
-import type { Question, Round } from "@/lib/types";
+import type { Question, Round } from "@/core/types";
 
 export function RoundSection({
   topicId,

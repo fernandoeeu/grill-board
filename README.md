@@ -134,6 +134,29 @@ GRILL_BOARD_DB=/tmp/grill-scratch.db npx grill-board
 
 The first boot creates the file, runs migrations, and imports a seed topic. Delete the file and the next boot rebuilds it.
 
+### Use as a library
+
+The package also ships its core as `grill-board/core`: the domain, the schema migrations and the twelve MCP tools, with no UI, no HTTP server and no file path. The host opens the SQLite connection and owns it. `better-sqlite3` fits as is; `bun:sqlite` fits when opened with `{ strict: true }`.
+
+```ts
+import { Database } from "bun:sqlite";
+import { createGrillCore, grillTools, migrate } from "grill-board/core";
+
+const db = new Database("grill-board.db", { strict: true });
+migrate(db); // idempotent; throws on a database from a newer grill-board
+
+const grill = createGrillCore(db);
+grill.createTopic({ title: "Ship the core", categories: ["scope"] });
+
+for (const tool of grillTools(grill)) {
+  // tool.name, tool.title, tool.description,
+  // tool.inputSchema (zod), tool.inputJsonSchema, tool.handler(args)
+  server.registerTool(tool.name, { title: tool.title, description: tool.description, inputSchema: tool.inputSchema }, tool.handler);
+}
+```
+
+The schema is the one the CLI writes, so an existing `grill-board.db` opens unchanged. Its tables are `topics`, `rounds`, `questions` and `schema_version`; a host that shares the file must not use those names.
+
 ### Upgrade
 
 ```bash

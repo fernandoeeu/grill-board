@@ -25,7 +25,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { answeredCount, groupByRound, isSettled } from "@/lib/board";
 import { cn } from "@/lib/utils";
 
-import type { Question, QuestionStatus, Round } from "@/lib/types";
+import type { Question, QuestionStatus, Round } from "@/core/types";
 
 /** A tick in the column: either a round header or one of its questions. */
 type Tick =

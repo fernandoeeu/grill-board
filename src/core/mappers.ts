@@ -6,7 +6,7 @@ import type {
   Round,
   RoundKind,
   TopicStatus,
-} from "@/lib/types";
+} from "./types.js";
 
 /**
  * Row shapes and row-to-domain mappers.

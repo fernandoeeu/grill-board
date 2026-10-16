@@ -2,7 +2,7 @@ import { copyFileSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import Database from "better-sqlite3";
 import { databaseFile } from "./connection.js";
-import { LATEST_VERSION } from "./migrations.js";
+import { LATEST_VERSION, schemaVersion } from "../../core/migrations.js";
 
 /** Legacy DB path used before the XDG migration. */
 const LEGACY_DB_PATH = "data/grill-board.db";
@@ -36,19 +36,7 @@ export function guardDowngrade(): void {
 
   const db = new Database(file, { readonly: true });
   try {
-    const tableExists = db
-      .prepare<[], { cnt: number }>(
-        "SELECT COUNT(*) AS cnt FROM sqlite_master WHERE type = 'table' AND name = 'schema_version'",
-      )
-      .get();
-
-    if (!tableExists || tableExists.cnt === 0) return;
-
-    const row = db
-      .prepare<[], { version: number }>("SELECT version FROM schema_version WHERE id = 1")
-      .get();
-    const dbVersion = row?.version ?? 0;
-
+    const dbVersion = schemaVersion(db);
     if (dbVersion > LATEST_VERSION) {
       console.error(
         `Your database was created by a newer version of grill-board (schema ${dbVersion}, code ${LATEST_VERSION}). ` +

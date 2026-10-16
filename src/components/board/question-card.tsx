@@ -17,7 +17,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
-import type { Question } from "@/lib/types";
+import type { Question } from "@/core/types";
 
 const PANEL_LABEL = "text-[11px] font-semibold tracking-[0.12em] uppercase";
 
