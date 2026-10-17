@@ -5,23 +5,15 @@
  * no redundant nesting, stable ordering.
  */
 
-import type { AnsweredVia, PendingQuestion } from "./types.js";
+import type { PendingQuestion } from "./types.js";
 import type { Db } from "./sqlite.js";
 import { topicNotFound } from "./errors.js";
 import { mapQuestionRow, type QuestionRow } from "./mappers.js";
+import { formatAnswers } from "./rules.js";
 
 /** A question row carried with the title of its topic. */
 interface PendingRow extends QuestionRow {
   topic_title: string;
-}
-
-/** One entry of the JSON export. */
-interface ExportedAnswer {
-  id: string;
-  round: number;
-  category: string;
-  answer: string;
-  answeredVia?: AnsweredVia;
 }
 
 const PENDING_SQL = `
@@ -99,19 +91,5 @@ export function exportAnswers(
   const rows = db.prepare<[string], QuestionRow>(ANSWERED_SQL).all(topicId);
   const questions = rows.map(mapQuestionRow);
 
-  if (format === "json") {
-    const answers: ExportedAnswer[] = questions.map((q) => ({
-      id: q.id,
-      round: q.roundNumber,
-      category: q.category,
-      answer: q.answer ?? "",
-      ...(q.answeredVia ? { answeredVia: q.answeredVia } : {}),
-    }));
-    return JSON.stringify({ topicId, title, answers });
-  }
-
-  const heading = `## Answers — ${title}`;
-  if (questions.length === 0) return heading;
-  const lines = questions.map((q) => `- **${q.id}** (round ${q.roundNumber}): ${q.answer ?? ""}`);
-  return [heading, "", ...lines].join("\n");
+  return formatAnswers({ id: topicId, title }, questions, format);
 }

@@ -157,6 +157,31 @@ for (const tool of grillTools(grill)) {
 
 The schema is the one the CLI writes, so an existing `grill-board.db` opens unchanged. Its tables are `topics`, `rounds`, `questions` and `schema_version`; a host that shares the file must not use those names.
 
+#### Another store, or prefixed tool names
+
+A host that keeps its data somewhere else (Convex, Postgres, an in-memory map) does not need SQLite. It implements the `GrillStore` port, whose methods may return promises, and reuses the pure rules so it behaves like the SQLite core:
+
+```ts
+import { grillToolSpecs, grillToolsFor, type GrillStore } from "grill-board/core";
+import { applyAnswer, buildQuestions, formatAnswers, topicNotFound } from "grill-board/core/rules";
+
+const prefix = "grill_";
+const store: GrillStore = {
+  /* listTopics, getTopic, createTopic, …, exportAnswers: each one async, each one built on the rules */
+};
+
+for (const tool of grillToolsFor(store, { prefix })) {
+  // tool.name is "grill_create_topic", …; tool.handler(args) returns Promise<ToolResult>
+}
+
+// Or only the metadata, for a server that wires its own handlers:
+const specs = grillToolSpecs({ prefix }); // name, baseName, title, description, inputSchema, inputJsonSchema
+```
+
+The prefix applies to every tool name and to every tool named in descriptions and error messages ("call grill_create_round next"). The error builders (`topicNotFound`, `roundNotFound`, `questionNotFound`, …) take the same prefix, so a store's own errors point at tools the agent can call.
+
+`grill-board/core/rules` imports no driver and no zod. It holds the rules every store shares: text, option and draft normalisation (empty means absent), `slugify` and `uniqueTopicId`, round numbering, the next free `q<n>`, the `recommendedOption` check and its drop when the options change, the declared-categories check, the answer, status and draft transitions, the export formats, `computeProgress`, `summarizeTopic`, and the board helpers `groupByRound`, `isSettled` and `answeredCount`.
+
 ### Upgrade
 
 ```bash

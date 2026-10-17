@@ -8,7 +8,7 @@
  * a stack trace.
  */
 
-import { NotFoundError } from "../errors.js";
+import { NotFoundError, toolName } from "../errors.js";
 
 /**
  * The single text block a tool answers with.
@@ -27,10 +27,15 @@ export function fail(message: string): ToolResult {
   return { isError: true, content: [{ type: "text", text: message }] };
 }
 
+/** A successful single-text-block answer. */
+export function ok(text: string): ToolResult {
+  return { content: [{ type: "text", text }] };
+}
+
 /** Runs one data-access call and hands its already-formatted text back. */
 export function textResult(produce: () => string): ToolResult {
   try {
-    return { content: [{ type: "text", text: produce() }] };
+    return ok(produce());
   } catch (error) {
     return failure(error);
   }
@@ -41,7 +46,8 @@ export function jsonResult(produce: () => unknown): ToolResult {
   return textResult(() => JSON.stringify(produce()));
 }
 
-function failure(error: unknown): ToolResult {
+/** Turns a thrown value into the `isError` result an agent reads. */
+export function failure(error: unknown, prefix = ""): ToolResult {
   if (error instanceof NotFoundError) {
     return fail(error.message);
   }
@@ -52,5 +58,7 @@ function failure(error: unknown): ToolResult {
     return fail(error.message);
   }
   console.error("[mcp] tool failed:", error);
-  return fail("the tool failed for an unknown reason; call get_topic to re-read the state");
+  return fail(
+    `the tool failed for an unknown reason; call ${toolName("get_topic", prefix)} to re-read the state`,
+  );
 }

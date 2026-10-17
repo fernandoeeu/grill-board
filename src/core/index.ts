@@ -10,6 +10,11 @@
  *     migrate(db);
  *     const grill = createGrillCore(db);
  *     for (const tool of grillTools(grill)) host.register(tool);
+ *
+ * A host on another store (Convex, Postgres…) skips SQLite: it implements the
+ * async `GrillStore` port on top of the pure rules in `grill-board/core/rules`
+ * and registers `grillToolsFor(store, { prefix })`, or only the
+ * `grillToolSpecs({ prefix })` when it wires its own handlers.
  */
 
 import { exportAnswers, listPendingQuestions } from "./export.js";
@@ -60,11 +65,31 @@ export function createGrillCore(connection: SqliteDatabase) {
 export type GrillCore = ReturnType<typeof createGrillCore>;
 
 export { LATEST_VERSION, migrate, schemaVersion } from "./migrations.js";
-export { NotFoundError } from "./errors.js";
-export { computeProgress } from "./progress.js";
+export {
+  NotFoundError,
+  questionIdTaken,
+  questionNotFound,
+  roundNotFound,
+  toolName,
+  topicIdTaken,
+  topicNotFound,
+} from "./errors.js";
+export { computeProgress, type QuestionPatch } from "./rules.js";
+export { answeredCount, groupByRound, isSettled, type RoundSectionData } from "./board.js";
 export type { SqliteDatabase, SqliteStatement } from "./sqlite.js";
 export type { NewRound } from "./topics.js";
 export type * from "./types.js";
-export { grillTools, type GrillTool } from "./mcp/tools.js";
+export {
+  grillTools,
+  grillToolSpecs,
+  grillToolsFor,
+  type Awaitable,
+  type GrillAsyncTool,
+  type GrillStore,
+  type GrillTool,
+  type GrillToolName,
+  type GrillToolOptions,
+  type GrillToolSpec,
+} from "./mcp/tools.js";
 export type { ToolResult } from "./mcp/result.js";
 export * from "./mcp/schemas.js";
