@@ -2,7 +2,9 @@
  * Data-access layer — questions.
  *
  * Every write to the `questions` table goes through this module. It is the
- * only place, together with the other `dal-*` files, that speaks SQL.
+ * only place, together with `topics.ts` and `export.ts`, that speaks SQL. The
+ * rules themselves (ids, normalisation, recommended option, transitions) live
+ * in `rules.ts`; this module reads rows, applies a rule, writes the result.
  *
  * Conventions shared with the rest of the layer:
  * - question ids are short (`q1`) and unique inside a topic; the primary key
@@ -17,6 +19,17 @@ import type { AnsweredVia, Draft, NewQuestion, Question, QuestionStatus } from "
 import type { Db } from "./sqlite.js";
 import { questionNotFound, roundNotFound, topicNotFound } from "./errors.js";
 import { mapQuestionRow, type QuestionRow } from "./mappers.js";
+import {
+  applyAnswer,
+  applyClearDraft,
+  applyDraft,
+  applyQuestionPatch,
+  applyStatus,
+  buildQuestions,
+  canClearDraft,
+  nextPosition,
+  type QuestionPatch,
+} from "./rules.js";
 
 /** Shared shape of every question read: the row plus its round number. */
 const QUESTION_SELECT = `
@@ -67,41 +80,69 @@ function touchTopic(db: Db, topicId: string, now: number): void {
   db.prepare<[number, string]>("UPDATE topics SET updated_at = ? WHERE id = ?").run(now, topicId);
 }
 
-/** Empty and whitespace-only text is stored as NULL, never as ''. */
-function textOrNull(value: string | null | undefined): string | null {
-  if (value === null || value === undefined) return null;
-  return value.trim() ? value : null;
+/** SQL NULL for an absent value. */
+function orNull<T>(value: T | undefined): T | null {
+  return value === undefined ? null : value;
 }
 
-/** An empty option list is stored as NULL so the mapper omits the field. */
-function optionsOrNull(options: string[] | null | undefined): string | null {
-  if (!options || options.length === 0) return null;
-  return JSON.stringify(options);
+/** Bind values of a full question write, from the domain object. */
+interface QuestionWrite {
+  topic_id: string;
+  id: string;
+  category: string;
+  status: QuestionStatus;
+  text: string;
+  recommendation: string | null;
+  recommended_option: string | null;
+  options: string | null;
+  note: string | null;
+  answer: string | null;
+  answered_via: AnsweredVia | null;
+  draft: string | null;
+  updated_at: number;
 }
 
-/** A recommended option is only meaningful when it names one of the pills. */
-function checkRecommendedOption(
-  recommendedOption: string | null,
-  options: string[] | undefined,
+/** Writes every mutable column of `question` (the rules already produced it). */
+function writeQuestion(db: Db, question: Question): void {
+  db.prepare<QuestionWrite>(
+    `UPDATE questions
+        SET category = @category, status = @status, text = @text,
+            recommendation = @recommendation, recommended_option = @recommended_option,
+            options = @options, note = @note, answer = @answer,
+            answered_via = @answered_via, draft = @draft, updated_at = @updated_at
+      WHERE topic_id = @topic_id AND id = @id`,
+  ).run({
+    topic_id: question.topicId,
+    id: question.id,
+    category: question.category,
+    status: question.status,
+    text: question.text,
+    recommendation: orNull(question.recommendation),
+    recommended_option: orNull(question.recommendedOption),
+    options: question.options ? JSON.stringify(question.options) : null,
+    note: orNull(question.note),
+    answer: orNull(question.answer),
+    answered_via: orNull(question.answeredVia),
+    draft: question.draft ? JSON.stringify(question.draft) : null,
+    updated_at: question.updatedAt,
+  });
+}
+
+/** Read, transform with a rule, write, touch the topic, read back. One transaction. */
+function transition(
+  db: Db,
+  topicId: string,
   questionId: string,
-): void {
-  if (recommendedOption === null) return;
-  if (!options || !options.includes(recommendedOption)) {
-    throw new Error(
-      `recommendedOption '${recommendedOption}' is not one of the options of question ` +
-        `'${questionId}'; it must match an entry of 'options' verbatim`,
-    );
-  }
-}
-
-/** A draft with no picked option and no text is not a draft: it is NULL. */
-function draftOrNull(draft: Draft | null | undefined): string | null {
-  if (!draft) return null;
-  const value: Draft = {};
-  if (draft.option && draft.option.trim()) value.option = draft.option;
-  if (draft.text && draft.text.trim()) value.text = draft.text;
-  if (value.option === undefined && value.text === undefined) return null;
-  return JSON.stringify(value);
+  apply: (current: Question, now: number) => Question,
+): Question {
+  const run = db.transaction((): Question => {
+    const now = Date.now();
+    const next = apply(readQuestion(db, topicId, questionId), now); // throws NotFoundError
+    writeQuestion(db, next);
+    touchTopic(db, topicId, now);
+    return readQuestion(db, topicId, questionId);
+  });
+  return run();
 }
 
 /**
@@ -120,8 +161,8 @@ export function addQuestions(
   requireTopic(db, topicId);
 
   const round = db
-    .prepare<[string, string], { id: string }>(
-      "SELECT id FROM rounds WHERE id = ? AND topic_id = ?",
+    .prepare<[string, string], { id: string; number: number }>(
+      "SELECT id, number FROM rounds WHERE id = ? AND topic_id = ?",
     )
     .get(roundId, topicId);
   if (!round) {
@@ -140,59 +181,43 @@ export function addQuestions(
   `);
 
   const run = db.transaction((): Question[] => {
-    const taken = new Set(
-      db
-        .prepare<[string], { id: string }>("SELECT id FROM questions WHERE topic_id = ?")
-        .all(topicId)
-        .map((row) => row.id),
-    );
-    const last = db
-      .prepare<[string], { max_position: number | null }>(
-        "SELECT MAX(position) AS max_position FROM questions WHERE topic_id = ?",
+    const existing = db
+      .prepare<[string], { id: string; position: number }>(
+        "SELECT id, position FROM questions WHERE topic_id = ?",
       )
-      .get(topicId);
+      .all(topicId);
 
     const now = Date.now();
-    let position = (last?.max_position ?? -1) + 1;
-    let counter = 1;
-    const ids: string[] = [];
+    const questions = buildQuestions({
+      topicId,
+      round,
+      items,
+      takenIds: existing.map((row) => row.id),
+      startPosition: nextPosition(existing.map((row) => row.position)),
+      now,
+    });
 
-    for (const item of items) {
-      let id = item.id;
-      if (id === undefined) {
-        while (taken.has(`q${counter}`)) counter += 1;
-        id = `q${counter}`;
-      } else if (taken.has(id)) {
-        throw new Error(
-          `question '${id}' already exists in topic '${topicId}'; use update_question`,
-        );
-      }
-      taken.add(id);
-      ids.push(id);
-
-      const recommendedOption = textOrNull(item.recommendedOption);
-      checkRecommendedOption(recommendedOption, item.options, id);
-
+    for (const question of questions) {
       insert.run({
-        id,
+        id: question.id,
         topic_id: topicId,
         round_id: roundId,
-        category: item.category,
-        status: item.status ?? "open",
-        text: item.text,
-        recommendation: textOrNull(item.recommendation),
-        recommended_option: recommendedOption,
-        options: optionsOrNull(item.options),
-        note: textOrNull(item.note),
-        position,
+        category: question.category,
+        status: question.status,
+        text: question.text,
+        recommendation: orNull(question.recommendation),
+        recommended_option: orNull(question.recommendedOption),
+        options: question.options ? JSON.stringify(question.options) : null,
+        note: orNull(question.note),
+        position: question.position,
         created_at: now,
         updated_at: now,
       });
-      position += 1;
     }
 
     touchTopic(db, topicId, now);
 
+    const ids = questions.map((question) => question.id);
     const placeholders = ids.map(() => "?").join(", ");
     const rows = db
       .prepare<string[], QuestionRow>(
@@ -214,71 +239,17 @@ export function updateQuestion(
   db: Db,
   topicId: string,
   questionId: string,
-  patch: {
-    text?: string;
-    recommendation?: string | null;
-    recommendedOption?: string | null;
-    options?: string[] | null;
-    category?: string;
-    note?: string | null;
-  },
+  patch: QuestionPatch,
 ): Question {
   const run = db.transaction((): Question => {
     const current = readQuestion(db, topicId, questionId); // throws NotFoundError
-    const assignments: string[] = [];
-    const params: Array<string | number | null> = [];
-
-    if (patch.text !== undefined) {
-      assignments.push("text = ?");
-      params.push(patch.text);
-    }
-    if (patch.category !== undefined) {
-      assignments.push("category = ?");
-      params.push(patch.category);
-    }
-    if (patch.recommendation !== undefined) {
-      assignments.push("recommendation = ?");
-      params.push(textOrNull(patch.recommendation));
-    }
-    if (patch.options !== undefined) {
-      assignments.push("options = ?");
-      params.push(optionsOrNull(patch.options));
-    }
-    if (patch.note !== undefined) {
-      assignments.push("note = ?");
-      params.push(textOrNull(patch.note));
-    }
-
-    // The recommended option must always name one of the effective options.
-    // Setting it validates against the (new or kept) list; replacing the list
-    // without re-stating it silently drops a marker the list no longer holds.
-    const effectiveOptions =
-      patch.options !== undefined ? (patch.options ?? undefined) : current.options;
-    if (patch.recommendedOption !== undefined) {
-      const next = textOrNull(patch.recommendedOption);
-      checkRecommendedOption(next, effectiveOptions, questionId);
-      assignments.push("recommended_option = ?");
-      params.push(next);
-    } else if (
-      patch.options !== undefined &&
-      current.recommendedOption !== undefined &&
-      !(effectiveOptions ?? []).includes(current.recommendedOption)
-    ) {
-      assignments.push("recommended_option = ?");
-      params.push(null);
-    }
+    const now = Date.now();
+    const { question, changed } = applyQuestionPatch(current, patch, now);
 
     // Nothing to change: read it back instead of bumping the timestamps.
-    if (assignments.length === 0) return current;
+    if (!changed) return current;
 
-    const now = Date.now();
-    assignments.push("updated_at = ?");
-    params.push(now);
-
-    db.prepare<Array<string | number | null>>(
-      `UPDATE questions SET ${assignments.join(", ")}
-        WHERE topic_id = ? AND id = ?`,
-    ).run(...params, topicId, questionId);
+    writeQuestion(db, question);
     touchTopic(db, topicId, now);
     return readQuestion(db, topicId, questionId);
   });
@@ -297,31 +268,9 @@ export function setQuestionStatus(
   status: QuestionStatus,
   note?: string,
 ): Question {
-  const now = Date.now();
-
-  const run = db.transaction((): Question => {
-    const result =
-      note === undefined
-        ? db
-            .prepare<[QuestionStatus, number, string, string]>(
-              `UPDATE questions SET status = ?, updated_at = ?
-                WHERE topic_id = ? AND id = ?`,
-            )
-            .run(status, now, topicId, questionId)
-        : db
-            .prepare<[QuestionStatus, string | null, number, string, string]>(
-              `UPDATE questions SET status = ?, note = ?, updated_at = ?
-                WHERE topic_id = ? AND id = ?`,
-            )
-            .run(status, textOrNull(note), now, topicId, questionId);
-    if (result.changes === 0) {
-      readQuestion(db, topicId, questionId); // throws NotFoundError
-    }
-    touchTopic(db, topicId, now);
-    return readQuestion(db, topicId, questionId);
-  });
-
-  return run();
+  return transition(db, topicId, questionId, (current, now) =>
+    applyStatus(current, status, note, now),
+  );
 }
 
 /**
@@ -335,25 +284,9 @@ export function answerQuestion(
   answer: string,
   answeredVia: AnsweredVia,
 ): Question {
-  const now = Date.now();
-
-  const run = db.transaction((): Question => {
-    const result = db
-      .prepare<[string, AnsweredVia, number, string, string]>(
-        `UPDATE questions
-            SET answer = ?, answered_via = ?, status = 'answered',
-                draft = NULL, updated_at = ?
-          WHERE topic_id = ? AND id = ?`,
-      )
-      .run(answer, answeredVia, now, topicId, questionId);
-    if (result.changes === 0) {
-      readQuestion(db, topicId, questionId); // throws NotFoundError
-    }
-    touchTopic(db, topicId, now);
-    return readQuestion(db, topicId, questionId);
-  });
-
-  return run();
+  return transition(db, topicId, questionId, (current, now) =>
+    applyAnswer(current, answer, answeredVia, now),
+  );
 }
 
 /**
@@ -366,23 +299,7 @@ export function saveDraft(
   questionId: string,
   draft: Draft | null,
 ): Question {
-  const now = Date.now();
-
-  const run = db.transaction((): Question => {
-    const result = db
-      .prepare<[string | null, number, string, string]>(
-        `UPDATE questions SET draft = ?, updated_at = ?
-          WHERE topic_id = ? AND id = ?`,
-      )
-      .run(draftOrNull(draft), now, topicId, questionId);
-    if (result.changes === 0) {
-      readQuestion(db, topicId, questionId); // throws NotFoundError
-    }
-    touchTopic(db, topicId, now);
-    return readQuestion(db, topicId, questionId);
-  });
-
-  return run();
+  return transition(db, topicId, questionId, (current, now) => applyDraft(current, draft, now));
 }
 
 /**
@@ -394,14 +311,14 @@ export function clearDrafts(db: Db, topicId: string): number {
   const now = Date.now();
 
   const run = db.transaction((): number => {
-    const result = db
-      .prepare<[number, string]>(
-        `UPDATE questions SET draft = NULL, updated_at = ?
-          WHERE topic_id = ? AND draft IS NOT NULL AND status = 'open'`,
-      )
-      .run(now, topicId);
-    if (result.changes > 0) touchTopic(db, topicId, now);
-    return result.changes;
+    const cleared = db
+      .prepare<[string], QuestionRow>(`${QUESTION_SELECT} WHERE q.topic_id = ?`)
+      .all(topicId)
+      .map(mapQuestionRow)
+      .filter(canClearDraft);
+    for (const question of cleared) writeQuestion(db, applyClearDraft(question, now));
+    if (cleared.length > 0) touchTopic(db, topicId, now);
+    return cleared.length;
   });
 
   return run();

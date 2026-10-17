@@ -6,7 +6,6 @@
  */
 
 import type {
-  Progress,
   Question,
   Round,
   RoundKind,
@@ -15,7 +14,7 @@ import type {
   TopicSummary,
 } from "./types.js";
 import type { Db } from "./sqlite.js";
-import { topicNotFound } from "./errors.js";
+import { topicIdTaken, topicNotFound } from "./errors.js";
 import {
   mapQuestionRow,
   mapRoundRow,
@@ -23,7 +22,13 @@ import {
   type RoundRow,
   type TopicRow,
 } from "./mappers.js";
-import { computeProgress } from "./progress.js";
+import {
+  computeProgress,
+  nextRoundNumber,
+  roundIdFor,
+  summarizeTopic,
+  uniqueTopicId,
+} from "./rules.js";
 
 const TOPIC_COLUMNS = "id, title, context, categories, status, created_at, updated_at";
 
@@ -106,7 +111,19 @@ export function listTopics(db: Db, status?: TopicStatus): TopicSummary[] {
 
   return topicRows.map((row) => {
     const questions = byTopic.get(row.id) ?? [];
-    return toSummary(row, computeProgress(questions), questions, roundCounts.get(row.id) ?? 0);
+    return summarizeTopic(
+      {
+        id: row.id,
+        title: row.title,
+        context: optionalText(row.context),
+        categories: parseCategories(row.categories),
+        status: toTopicStatus(row.status),
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+      },
+      questions,
+      roundCounts.get(row.id) ?? 0,
+    );
   });
 }
 
@@ -164,11 +181,11 @@ export function createTopic(
   },
 ): TopicDetail {
   if (input.id !== undefined && topicExists(db, input.id)) {
-    throw new Error(`topic id '${input.id}' already exists; call get_topic or pick another id`);
+    throw topicIdTaken(input.id);
   }
 
   const now = Date.now();
-  const id = input.id ?? uniqueSlug(db, input.title);
+  const id = input.id ?? uniqueTopicId(input.title, (candidate) => topicExists(db, candidate), now);
   const values: TopicInsert = {
     id,
     title: input.title,
@@ -236,13 +253,13 @@ export function createRound(db: Db, topicId: string, extras: NewRound = {}): Rou
       throw topicNotFound(topicId);
     }
 
-    const next = db
-      .prepare<[string], { number: number }>(
-        "SELECT COALESCE(MAX(number), 0) + 1 AS number FROM rounds WHERE topic_id = ?",
-      )
-      .get(topicId);
-    const number = next ? next.number : 1;
-    const id = `${topicId}#r${number}`;
+    const number = nextRoundNumber(
+      db
+        .prepare<[string], { number: number }>("SELECT number FROM rounds WHERE topic_id = ?")
+        .all(topicId)
+        .map((row) => row.number),
+    );
+    const id = roundIdFor(topicId, number);
 
     const values: RoundInsert = {
       id,
@@ -283,28 +300,6 @@ function topicExists(db: Db, topicId: string): boolean {
   );
 }
 
-function toSummary(
-  row: TopicRow,
-  progress: Progress,
-  questions: Question[],
-  roundCount: number,
-): TopicSummary {
-  const summary: TopicSummary = {
-    id: row.id,
-    title: row.title,
-    categories: parseCategories(row.categories),
-    status: toTopicStatus(row.status),
-    progress,
-    roundCount,
-    openCount: questions.filter((question) => question.status === "open").length,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
-  };
-  const context = optionalText(row.context);
-  if (context !== undefined) summary.context = context;
-  return summary;
-}
-
 /** SQL NULL (and the empty string) mean "absent" — the domain type omits the key. */
 function optionalText(value: string | null | undefined): string | undefined {
   return value === null || value === undefined || value === "" ? undefined : value;
@@ -319,26 +314,4 @@ function parseCategories(raw: string): string[] {
   const parsed: unknown = JSON.parse(raw);
   if (!Array.isArray(parsed)) return [];
   return parsed.filter((entry): entry is string => typeof entry === "string");
-}
-
-/** `Ambientes efêmeros!` → `ambientes-efemeros`. */
-function slugify(title: string): string {
-  const slug = title
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .slice(0, 60)
-    .replace(/^-+|-+$/g, "");
-  return slug === "" ? "topic" : slug;
-}
-
-function uniqueSlug(db: Db, title: string): string {
-  const base = slugify(title);
-  if (!topicExists(db, base)) return base;
-  for (let suffix = 2; suffix < 1000; suffix += 1) {
-    const candidate = `${base}-${suffix}`;
-    if (!topicExists(db, candidate)) return candidate;
-  }
-  return `${base}-${Date.now()}`;
 }
